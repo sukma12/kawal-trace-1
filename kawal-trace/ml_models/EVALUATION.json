@@ -1,0 +1,1829 @@
+{
+ "variants": {
+  "naive_bayes_only": {
+   "about": "hanya skor teks Naive Bayes (dikalibrasi), tanpa sinyal tautan/teks",
+   "leave_one_group_out": {
+    "n_phishing": 103,
+    "n_legit": 109,
+    "auc": 0.9262,
+    "thresholds": {
+     "suspicious": 0.6936,
+     "phishing": 0.8616
+    },
+    "phishing_band": {
+     "recall": 0.5631,
+     "recall_ci95": [
+      0.4668,
+      0.6549
+     ],
+     "false_positive_rate": 0.0275,
+     "fpr_ci95": [
+      0.0094,
+      0.0778
+     ],
+     "precision": 0.9508
+    },
+    "at_least_suspicious": {
+     "recall": 0.7379,
+     "recall_ci95": [
+      0.6455,
+      0.8131
+     ],
+     "false_positive_rate": 0.1009,
+     "fpr_ci95": [
+      0.0573,
+      0.1717
+     ]
+    },
+    "per_group": {
+     "academic_school": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "account_alert": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.5714285714285714,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "apk_whatsapp": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.14285714285714285,
+      "flagged_at_least_suspicious": 0.42857142857142855
+     },
+     "bank_credential": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.7142857142857143,
+      "flagged_at_least_suspicious": 0.8571428571428571
+     },
+     "billing_receipts": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "community_org": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "compromised_hosting": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "crypto_tech_support": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.7142857142857143,
+      "flagged_at_least_suspicious": 0.8571428571428571
+     },
+     "delivery_fee": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.5714285714285714,
+      "flagged_at_least_suspicious": 0.8571428571428571
+     },
+     "dev_tools": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "document_share": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.8571428571428571,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "government_tax": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.7142857142857143,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "hr_admin": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "html_deceptive_links": {
+      "label": 1,
+      "n": 5,
+      "flagged_phishing": 0.6,
+      "flagged_at_least_suspicious": 0.8
+     },
+     "html_mail_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "impersonation_request": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "job_scam": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.14285714285714285,
+      "flagged_at_least_suspicious": 0.42857142857142855
+     },
+     "links_varied_tld": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.25
+     },
+     "loan_gambling_spam": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.5714285714285714,
+      "flagged_at_least_suspicious": 0.8571428571428571
+     },
+     "newsletter_marketing": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "ops_alerts": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "order_shipping": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.375
+     },
+     "payment_invoice": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.7142857142857143,
+      "flagged_at_least_suspicious": 0.7142857142857143
+     },
+     "personal_chat": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.25
+     },
+     "prize_lottery": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.8571428571428571,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "romance_investment": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.2857142857142857,
+      "flagged_at_least_suspicious": 0.2857142857142857
+     },
+     "security_notice_legit": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.375,
+      "flagged_at_least_suspicious": 0.5
+     },
+     "travel_booking": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "work_coordination": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     }
+    }
+   },
+   "challenge_set": {
+    "n_phishing": 40,
+    "n_legit": 45,
+    "auc": 0.9867,
+    "thresholds": {
+     "suspicious": 0.6936,
+     "phishing": 0.8616
+    },
+    "phishing_band": {
+     "recall": 0.825,
+     "recall_ci95": [
+      0.6805,
+      0.9125
+     ],
+     "false_positive_rate": 0.0222,
+     "fpr_ci95": [
+      0.0039,
+      0.1157
+     ],
+     "precision": 0.9706
+    },
+    "at_least_suspicious": {
+     "recall": 0.975,
+     "recall_ci95": [
+      0.8712,
+      0.9956
+     ],
+     "false_positive_rate": 0.1111,
+     "fpr_ci95": [
+      0.0484,
+      0.235
+     ]
+    },
+    "per_group": {
+     "bank_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.2,
+      "flagged_at_least_suspicious": 0.4
+     },
+     "charity_donation": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "fake_security_vendor": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 0.75,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "friends_family": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "gaming_streaming": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "government_id": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 0.75,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "government_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "insurance_loan": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "marketplace_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.2
+     },
+     "marketplace_refund": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 0.75,
+      "flagged_at_least_suspicious": 0.75
+     },
+     "security_awareness": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.2
+     },
+     "social_engineering": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 0.5,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "tech_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "telco_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "telco_sim": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "travel_booking_scam": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 0.5,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "utility_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.2
+     },
+     "utility_scam": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "work_misc": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     }
+    }
+   }
+  },
+  "signals_only": {
+   "about": "hanya sinyal tautan/teks, tanpa Naive Bayes",
+   "leave_one_group_out": {
+    "n_phishing": 103,
+    "n_legit": 109,
+    "auc": 0.9229,
+    "thresholds": {
+     "suspicious": 0.2852,
+     "phishing": 0.6321
+    },
+    "phishing_band": {
+     "recall": 0.6699,
+     "recall_ci95": [
+      0.5744,
+      0.7532
+     ],
+     "false_positive_rate": 0.0275,
+     "fpr_ci95": [
+      0.0094,
+      0.0778
+     ],
+     "precision": 0.9583
+    },
+    "at_least_suspicious": {
+     "recall": 0.9029,
+     "recall_ci95": [
+      0.8304,
+      0.9464
+     ],
+     "false_positive_rate": 0.0917,
+     "fpr_ci95": [
+      0.0506,
+      0.1607
+     ]
+    },
+    "per_group": {
+     "academic_school": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "account_alert": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.8571428571428571,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "apk_whatsapp": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "bank_credential": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.7142857142857143,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "billing_receipts": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "community_org": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "compromised_hosting": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.14285714285714285,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "crypto_tech_support": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.8571428571428571,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "delivery_fee": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "dev_tools": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "document_share": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.8571428571428571,
+      "flagged_at_least_suspicious": 0.8571428571428571
+     },
+     "government_tax": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.8571428571428571,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "hr_admin": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "html_deceptive_links": {
+      "label": 1,
+      "n": 5,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "html_mail_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "impersonation_request": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.42857142857142855
+     },
+     "job_scam": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.2857142857142857,
+      "flagged_at_least_suspicious": 0.7142857142857143
+     },
+     "links_varied_tld": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.25,
+      "flagged_at_least_suspicious": 0.5
+     },
+     "loan_gambling_spam": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.5714285714285714,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "newsletter_marketing": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.375
+     },
+     "ops_alerts": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.125,
+      "flagged_at_least_suspicious": 0.25
+     },
+     "order_shipping": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "payment_invoice": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.7142857142857143,
+      "flagged_at_least_suspicious": 0.8571428571428571
+     },
+     "personal_chat": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "prize_lottery": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.8571428571428571,
+      "flagged_at_least_suspicious": 0.8571428571428571
+     },
+     "romance_investment": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.42857142857142855,
+      "flagged_at_least_suspicious": 0.8571428571428571
+     },
+     "security_notice_legit": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.125
+     },
+     "travel_booking": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "work_coordination": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     }
+    }
+   },
+   "challenge_set": {
+    "n_phishing": 40,
+    "n_legit": 45,
+    "auc": 0.9967,
+    "thresholds": {
+     "suspicious": 0.2852,
+     "phishing": 0.6321
+    },
+    "phishing_band": {
+     "recall": 0.85,
+     "recall_ci95": [
+      0.7093,
+      0.9294
+     ],
+     "false_positive_rate": 0.0,
+     "fpr_ci95": [
+      0.0,
+      0.0787
+     ],
+     "precision": 1.0
+    },
+    "at_least_suspicious": {
+     "recall": 1.0,
+     "recall_ci95": [
+      0.9124,
+      1.0
+     ],
+     "false_positive_rate": 0.0667,
+     "fpr_ci95": [
+      0.0229,
+      0.1786
+     ]
+    },
+    "per_group": {
+     "bank_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.2
+     },
+     "charity_donation": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 0.75,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "fake_security_vendor": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "friends_family": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "gaming_streaming": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "government_id": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 0.75,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "government_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "insurance_loan": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 0.5,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "marketplace_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.2
+     },
+     "marketplace_refund": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 0.75,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "security_awareness": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "social_engineering": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 0.75,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "tech_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.2
+     },
+     "telco_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "telco_sim": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "travel_booking_scam": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "utility_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "utility_scam": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "work_misc": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     }
+    }
+   }
+  },
+  "ensemble": {
+   "about": "ensemble: Naive Bayes + sinyal, korpus tulisan tangan saja",
+   "leave_one_group_out": {
+    "n_phishing": 103,
+    "n_legit": 109,
+    "auc": 0.9744,
+    "thresholds": {
+     "suspicious": 0.4583,
+     "phishing": 0.7189
+    },
+    "phishing_band": {
+     "recall": 0.767,
+     "recall_ci95": [
+      0.6767,
+      0.8381
+     ],
+     "false_positive_rate": 0.0275,
+     "fpr_ci95": [
+      0.0094,
+      0.0778
+     ],
+     "precision": 0.9634
+    },
+    "at_least_suspicious": {
+     "recall": 0.8932,
+     "recall_ci95": [
+      0.8188,
+      0.9393
+     ],
+     "false_positive_rate": 0.0917,
+     "fpr_ci95": [
+      0.0506,
+      0.1607
+     ]
+    },
+    "per_group": {
+     "academic_school": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "account_alert": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.8571428571428571,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "apk_whatsapp": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.5714285714285714,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "bank_credential": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.8571428571428571,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "billing_receipts": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "community_org": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "compromised_hosting": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.8571428571428571,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "crypto_tech_support": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "delivery_fee": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.8571428571428571,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "dev_tools": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "document_share": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.8571428571428571,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "government_tax": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "hr_admin": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "html_deceptive_links": {
+      "label": 1,
+      "n": 5,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "html_mail_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "impersonation_request": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.14285714285714285
+     },
+     "job_scam": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.5714285714285714,
+      "flagged_at_least_suspicious": 0.5714285714285714
+     },
+     "links_varied_tld": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.125,
+      "flagged_at_least_suspicious": 0.25
+     },
+     "loan_gambling_spam": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.8571428571428571,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "newsletter_marketing": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "ops_alerts": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.125,
+      "flagged_at_least_suspicious": 0.125
+     },
+     "order_shipping": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.125
+     },
+     "payment_invoice": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.7142857142857143,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "personal_chat": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.25
+     },
+     "prize_lottery": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "romance_investment": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.5714285714285714,
+      "flagged_at_least_suspicious": 0.7142857142857143
+     },
+     "security_notice_legit": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.125,
+      "flagged_at_least_suspicious": 0.5
+     },
+     "travel_booking": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "work_coordination": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     }
+    }
+   },
+   "challenge_set": {
+    "n_phishing": 40,
+    "n_legit": 45,
+    "auc": 0.9989,
+    "thresholds": {
+     "suspicious": 0.4583,
+     "phishing": 0.7189
+    },
+    "phishing_band": {
+     "recall": 0.95,
+     "recall_ci95": [
+      0.835,
+      0.9862
+     ],
+     "false_positive_rate": 0.0,
+     "fpr_ci95": [
+      0.0,
+      0.0787
+     ],
+     "precision": 1.0
+    },
+    "at_least_suspicious": {
+     "recall": 1.0,
+     "recall_ci95": [
+      0.9124,
+      1.0
+     ],
+     "false_positive_rate": 0.0889,
+     "fpr_ci95": [
+      0.0351,
+      0.2073
+     ]
+    },
+    "per_group": {
+     "bank_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.4
+     },
+     "charity_donation": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "fake_security_vendor": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "friends_family": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "gaming_streaming": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "government_id": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 0.75,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "government_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "insurance_loan": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "marketplace_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.2
+     },
+     "marketplace_refund": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 0.75,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "security_awareness": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "social_engineering": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "tech_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "telco_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "telco_sim": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "travel_booking_scam": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "utility_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.2
+     },
+     "utility_scam": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "work_misc": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     }
+    }
+   }
+  },
+  "ensemble_plus_templates": {
+   "about": "ensemble + 800 contoh templat sintetis berbobot 0,25 untuk Naive Bayes",
+   "leave_one_group_out": {
+    "n_phishing": 103,
+    "n_legit": 109,
+    "auc": 0.9685,
+    "thresholds": {
+     "suspicious": 0.4614,
+     "phishing": 0.7871
+    },
+    "phishing_band": {
+     "recall": 0.7379,
+     "recall_ci95": [
+      0.6455,
+      0.8131
+     ],
+     "false_positive_rate": 0.0275,
+     "fpr_ci95": [
+      0.0094,
+      0.0778
+     ],
+     "precision": 0.962
+    },
+    "at_least_suspicious": {
+     "recall": 0.8932,
+     "recall_ci95": [
+      0.8188,
+      0.9393
+     ],
+     "false_positive_rate": 0.1009,
+     "fpr_ci95": [
+      0.0573,
+      0.1717
+     ]
+    },
+    "per_group": {
+     "academic_school": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "account_alert": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.8571428571428571,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "apk_whatsapp": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.5714285714285714,
+      "flagged_at_least_suspicious": 0.8571428571428571
+     },
+     "bank_credential": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.8571428571428571,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "billing_receipts": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "community_org": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "compromised_hosting": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "crypto_tech_support": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "delivery_fee": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "dev_tools": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "document_share": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.8571428571428571,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "government_tax": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "hr_admin": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "html_deceptive_links": {
+      "label": 1,
+      "n": 5,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "html_mail_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "impersonation_request": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.14285714285714285
+     },
+     "job_scam": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.2857142857142857,
+      "flagged_at_least_suspicious": 0.7142857142857143
+     },
+     "links_varied_tld": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.25
+     },
+     "loan_gambling_spam": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.7142857142857143,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "newsletter_marketing": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "ops_alerts": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.125,
+      "flagged_at_least_suspicious": 0.125
+     },
+     "order_shipping": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.125
+     },
+     "payment_invoice": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.7142857142857143,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "personal_chat": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.25
+     },
+     "prize_lottery": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "romance_investment": {
+      "label": 1,
+      "n": 7,
+      "flagged_phishing": 0.2857142857142857,
+      "flagged_at_least_suspicious": 0.7142857142857143
+     },
+     "security_notice_legit": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.25,
+      "flagged_at_least_suspicious": 0.5
+     },
+     "travel_booking": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.125
+     },
+     "work_coordination": {
+      "label": 0,
+      "n": 8,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     }
+    }
+   },
+   "challenge_set": {
+    "n_phishing": 40,
+    "n_legit": 45,
+    "auc": 0.9894,
+    "thresholds": {
+     "suspicious": 0.4614,
+     "phishing": 0.7871
+    },
+    "phishing_band": {
+     "recall": 0.9,
+     "recall_ci95": [
+      0.7695,
+      0.9604
+     ],
+     "false_positive_rate": 0.0222,
+     "fpr_ci95": [
+      0.0039,
+      0.1157
+     ],
+     "precision": 0.973
+    },
+    "at_least_suspicious": {
+     "recall": 1.0,
+     "recall_ci95": [
+      0.9124,
+      1.0
+     ],
+     "false_positive_rate": 0.2,
+     "fpr_ci95": [
+      0.109,
+      0.3382
+     ]
+    },
+    "per_group": {
+     "bank_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.2,
+      "flagged_at_least_suspicious": 0.4
+     },
+     "charity_donation": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 0.75,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "fake_security_vendor": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "friends_family": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "gaming_streaming": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "government_id": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 0.75,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "government_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "insurance_loan": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "marketplace_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.4
+     },
+     "marketplace_refund": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 0.75,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "security_awareness": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.4
+     },
+     "social_engineering": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "tech_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     },
+     "telco_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.4
+     },
+     "telco_sim": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "travel_booking_scam": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 0.75,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "utility_legit": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.2
+     },
+     "utility_scam": {
+      "label": 1,
+      "n": 4,
+      "flagged_phishing": 1.0,
+      "flagged_at_least_suspicious": 1.0
+     },
+     "work_misc": {
+      "label": 0,
+      "n": 5,
+      "flagged_phishing": 0.0,
+      "flagged_at_least_suspicious": 0.0
+     }
+    }
+   }
+  }
+ },
+ "baseline_template_model": {
+  "about": "model lama: Naive Bayes pada korpus templat sintetis, PHISHING bila skor >= 0,70 (tidak pernah melihat data di atas)",
+  "seed_corpus": {
+   "n_phishing": 103,
+   "n_legit": 109,
+   "auc": 0.8985,
+   "thresholds": {
+    "suspicious": 0.7,
+    "phishing": 0.7
+   },
+   "phishing_band": {
+    "recall": 0.6505,
+    "recall_ci95": [
+     0.5545,
+     0.7357
+    ],
+    "false_positive_rate": 0.0367,
+    "fpr_ci95": [
+     0.0144,
+     0.0906
+    ],
+    "precision": 0.9437
+   },
+   "at_least_suspicious": {
+    "recall": 0.6505,
+    "recall_ci95": [
+     0.5545,
+     0.7357
+    ],
+    "false_positive_rate": 0.0367,
+    "fpr_ci95": [
+     0.0144,
+     0.0906
+    ]
+   },
+   "per_group": {
+    "academic_school": {
+     "label": 0,
+     "n": 8,
+     "flagged_phishing": 0.0,
+     "flagged_at_least_suspicious": 0.0
+    },
+    "account_alert": {
+     "label": 1,
+     "n": 7,
+     "flagged_phishing": 0.8571428571428571,
+     "flagged_at_least_suspicious": 0.8571428571428571
+    },
+    "apk_whatsapp": {
+     "label": 1,
+     "n": 7,
+     "flagged_phishing": 0.2857142857142857,
+     "flagged_at_least_suspicious": 0.2857142857142857
+    },
+    "bank_credential": {
+     "label": 1,
+     "n": 7,
+     "flagged_phishing": 0.8571428571428571,
+     "flagged_at_least_suspicious": 0.8571428571428571
+    },
+    "billing_receipts": {
+     "label": 0,
+     "n": 8,
+     "flagged_phishing": 0.0,
+     "flagged_at_least_suspicious": 0.0
+    },
+    "community_org": {
+     "label": 0,
+     "n": 8,
+     "flagged_phishing": 0.0,
+     "flagged_at_least_suspicious": 0.0
+    },
+    "compromised_hosting": {
+     "label": 1,
+     "n": 7,
+     "flagged_phishing": 0.7142857142857143,
+     "flagged_at_least_suspicious": 0.7142857142857143
+    },
+    "crypto_tech_support": {
+     "label": 1,
+     "n": 7,
+     "flagged_phishing": 0.8571428571428571,
+     "flagged_at_least_suspicious": 0.8571428571428571
+    },
+    "delivery_fee": {
+     "label": 1,
+     "n": 7,
+     "flagged_phishing": 0.8571428571428571,
+     "flagged_at_least_suspicious": 0.8571428571428571
+    },
+    "dev_tools": {
+     "label": 0,
+     "n": 8,
+     "flagged_phishing": 0.0,
+     "flagged_at_least_suspicious": 0.0
+    },
+    "document_share": {
+     "label": 1,
+     "n": 7,
+     "flagged_phishing": 0.8571428571428571,
+     "flagged_at_least_suspicious": 0.8571428571428571
+    },
+    "government_tax": {
+     "label": 1,
+     "n": 7,
+     "flagged_phishing": 0.8571428571428571,
+     "flagged_at_least_suspicious": 0.8571428571428571
+    },
+    "hr_admin": {
+     "label": 0,
+     "n": 8,
+     "flagged_phishing": 0.0,
+     "flagged_at_least_suspicious": 0.0
+    },
+    "html_deceptive_links": {
+     "label": 1,
+     "n": 5,
+     "flagged_phishing": 1.0,
+     "flagged_at_least_suspicious": 1.0
+    },
+    "html_mail_legit": {
+     "label": 0,
+     "n": 5,
+     "flagged_phishing": 0.0,
+     "flagged_at_least_suspicious": 0.0
+    },
+    "impersonation_request": {
+     "label": 1,
+     "n": 7,
+     "flagged_phishing": 0.0,
+     "flagged_at_least_suspicious": 0.0
+    },
+    "job_scam": {
+     "label": 1,
+     "n": 7,
+     "flagged_phishing": 0.14285714285714285,
+     "flagged_at_least_suspicious": 0.14285714285714285
+    },
+    "links_varied_tld": {
+     "label": 0,
+     "n": 8,
+     "flagged_phishing": 0.125,
+     "flagged_at_least_suspicious": 0.125
+    },
+    "loan_gambling_spam": {
+     "label": 1,
+     "n": 7,
+     "flagged_phishing": 0.7142857142857143,
+     "flagged_at_least_suspicious": 0.7142857142857143
+    },
+    "newsletter_marketing": {
+     "label": 0,
+     "n": 8,
+     "flagged_phishing": 0.0,
+     "flagged_at_least_suspicious": 0.0
+    },
+    "ops_alerts": {
+     "label": 0,
+     "n": 8,
+     "flagged_phishing": 0.0,
+     "flagged_at_least_suspicious": 0.0
+    },
+    "order_shipping": {
+     "label": 0,
+     "n": 8,
+     "flagged_phishing": 0.125,
+     "flagged_at_least_suspicious": 0.125
+    },
+    "payment_invoice": {
+     "label": 1,
+     "n": 7,
+     "flagged_phishing": 0.7142857142857143,
+     "flagged_at_least_suspicious": 0.7142857142857143
+    },
+    "personal_chat": {
+     "label": 0,
+     "n": 8,
+     "flagged_phishing": 0.0,
+     "flagged_at_least_suspicious": 0.0
+    },
+    "prize_lottery": {
+     "label": 1,
+     "n": 7,
+     "flagged_phishing": 0.8571428571428571,
+     "flagged_at_least_suspicious": 0.8571428571428571
+    },
+    "romance_investment": {
+     "label": 1,
+     "n": 7,
+     "flagged_phishing": 0.2857142857142857,
+     "flagged_at_least_suspicious": 0.2857142857142857
+    },
+    "security_notice_legit": {
+     "label": 0,
+     "n": 8,
+     "flagged_phishing": 0.25,
+     "flagged_at_least_suspicious": 0.25
+    },
+    "travel_booking": {
+     "label": 0,
+     "n": 8,
+     "flagged_phishing": 0.0,
+     "flagged_at_least_suspicious": 0.0
+    },
+    "work_coordination": {
+     "label": 0,
+     "n": 8,
+     "flagged_phishing": 0.0,
+     "flagged_at_least_suspicious": 0.0
+    }
+   }
+  },
+  "challenge_set": {
+   "n_phishing": 40,
+   "n_legit": 45,
+   "auc": 0.8389,
+   "thresholds": {
+    "suspicious": 0.7,
+    "phishing": 0.7
+   },
+   "phishing_band": {
+    "recall": 0.7,
+    "recall_ci95": [
+     0.5457,
+     0.8193
+    ],
+    "false_positive_rate": 0.2444,
+    "fpr_ci95": [
+     0.1424,
+     0.3867
+    ],
+    "precision": 0.7179
+   },
+   "at_least_suspicious": {
+    "recall": 0.7,
+    "recall_ci95": [
+     0.5457,
+     0.8193
+    ],
+    "false_positive_rate": 0.2444,
+    "fpr_ci95": [
+     0.1424,
+     0.3867
+    ]
+   },
+   "per_group": {
+    "bank_legit": {
+     "label": 0,
+     "n": 5,
+     "flagged_phishing": 0.4,
+     "flagged_at_least_suspicious": 0.4
+    },
+    "charity_donation": {
+     "label": 1,
+     "n": 4,
+     "flagged_phishing": 0.5,
+     "flagged_at_least_suspicious": 0.5
+    },
+    "fake_security_vendor": {
+     "label": 1,
+     "n": 4,
+     "flagged_phishing": 0.75,
+     "flagged_at_least_suspicious": 0.75
+    },
+    "friends_family": {
+     "label": 0,
+     "n": 5,
+     "flagged_phishing": 0.2,
+     "flagged_at_least_suspicious": 0.2
+    },
+    "gaming_streaming": {
+     "label": 1,
+     "n": 4,
+     "flagged_phishing": 1.0,
+     "flagged_at_least_suspicious": 1.0
+    },
+    "government_id": {
+     "label": 1,
+     "n": 4,
+     "flagged_phishing": 0.5,
+     "flagged_at_least_suspicious": 0.5
+    },
+    "government_legit": {
+     "label": 0,
+     "n": 5,
+     "flagged_phishing": 0.2,
+     "flagged_at_least_suspicious": 0.2
+    },
+    "insurance_loan": {
+     "label": 1,
+     "n": 4,
+     "flagged_phishing": 0.75,
+     "flagged_at_least_suspicious": 0.75
+    },
+    "marketplace_legit": {
+     "label": 0,
+     "n": 5,
+     "flagged_phishing": 0.2,
+     "flagged_at_least_suspicious": 0.2
+    },
+    "marketplace_refund": {
+     "label": 1,
+     "n": 4,
+     "flagged_phishing": 0.5,
+     "flagged_at_least_suspicious": 0.5
+    },
+    "security_awareness": {
+     "label": 0,
+     "n": 5,
+     "flagged_phishing": 0.4,
+     "flagged_at_least_suspicious": 0.4
+    },
+    "social_engineering": {
+     "label": 1,
+     "n": 4,
+     "flagged_phishing": 0.75,
+     "flagged_at_least_suspicious": 0.75
+    },
+    "tech_legit": {
+     "label": 0,
+     "n": 5,
+     "flagged_phishing": 0.2,
+     "flagged_at_least_suspicious": 0.2
+    },
+    "telco_legit": {
+     "label": 0,
+     "n": 5,
+     "flagged_phishing": 0.4,
+     "flagged_at_least_suspicious": 0.4
+    },
+    "telco_sim": {
+     "label": 1,
+     "n": 4,
+     "flagged_phishing": 0.75,
+     "flagged_at_least_suspicious": 0.75
+    },
+    "travel_booking_scam": {
+     "label": 1,
+     "n": 4,
+     "flagged_phishing": 0.75,
+     "flagged_at_least_suspicious": 0.75
+    },
+    "utility_legit": {
+     "label": 0,
+     "n": 5,
+     "flagged_phishing": 0.2,
+     "flagged_at_least_suspicious": 0.2
+    },
+    "utility_scam": {
+     "label": 1,
+     "n": 4,
+     "flagged_phishing": 0.75,
+     "flagged_at_least_suspicious": 0.75
+    },
+    "work_misc": {
+     "label": 0,
+     "n": 5,
+     "flagged_phishing": 0.0,
+     "flagged_at_least_suspicious": 0.0
+    }
+   }
+  }
+ },
+ "chosen": "ensemble",
+ "model_sha256": "e944ea309dad8bbd9857bebbc15abfa7998c17df226c651ee2af39348a934314",
+ "corpus": {
+  "seed_rows": 212,
+  "seed_groups": 29,
+  "challenge_rows": 85,
+  "template_rows": 800,
+  "source": "hand-written corpus (ml_models/corpus_seed.py)"
+ },
+ "generated_utc": "2026-11-01T08:07:31+00:00"
+}

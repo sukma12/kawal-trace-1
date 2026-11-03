@@ -1,0 +1,14 @@
+{
+  "sha256": {
+    "phishing_model.json": "e944ea309dad8bbd9857bebbc15abfa7998c17df226c651ee2af39348a934314"
+  },
+  "training": {
+    "samples": 212,
+    "groups": 29,
+    "source": "hand-written corpus (ml_models/corpus_seed.py)",
+    "variant": "ensemble",
+    "template_weight": 0.0,
+    "trained_at": "2026-11-01T08:07:31+00:00",
+    "evaluation": "lihat EVALUATION.json dan docs/AI_MODEL.md; angka tidak diulang di sini agar tidak basi"
+  }
+}
