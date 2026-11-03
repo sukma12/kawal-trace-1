@@ -1,0 +1,285 @@
+openapi: 3.1.0
+info:
+  title: Kawal-Trace Audit Sync and Server Telemetry Contract
+  version: 1.8.0
+  description: >-
+    Contract for client audit sync plus Linux server security telemetry. These
+    routes are an integration contract; the user's existing API must implement
+    or adapt them before the project can read server events. Retain TLS validation,
+    scoped credentials, validation, idempotency, and append-only event storage.
+servers:
+  - url: https://api.example.invalid
+security:
+  - DeviceBearer: []
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      summary: Authenticated client health check
+      security:
+        - DeviceBearer: []
+      parameters:
+        - $ref: '#/components/parameters/DeviceID'
+      responses:
+        '200':
+          description: Service reachable and device credential accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, examples: [ok] }
+                  service: { type: string }
+        '401': { description: Invalid or revoked device credential }
+        '403': { description: Device is not authorized }
+  "/api/v1/audit/events:batch":
+    post:
+      operationId: ingestAuditBatch
+      summary: Validate and durably ingest a contiguous per-device batch
+      parameters:
+        - $ref: '#/components/parameters/DeviceID'
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema: { type: string, minLength: 64, maxLength: 64 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchRequest'
+      responses:
+        '200':
+          description: Batch accepted or recognized idempotent retry
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchAck'
+        '400': { description: Invalid JSON, schema, hash, or chain link }
+        '401': { description: Invalid or revoked credential }
+        '403': { description: Device ID does not match token enrollment }
+        '409': { description: Sequence gap or conflicting duplicate }
+        '413': { description: Payload too large }
+        '429': { description: Rate limit exceeded }
+  "/api/v1/security-events:batch":
+    post:
+      operationId: ingestLinuxSecurityEvents
+      summary: Ingest normalized telemetry from an enrolled Linux server agent
+      security:
+        - SensorBearer: []
+      parameters:
+        - $ref: '#/components/parameters/HostID'
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema: { type: string, pattern: '^[0-9a-f]{64}$' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecurityBatchRequest'
+      responses:
+        '200':
+          description: Persisted event IDs; retries must be idempotent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityBatchAck'
+        '400': { description: Invalid event schema or payload }
+        '401': { description: Invalid or revoked sensor token }
+        '403': { description: Token is not enrolled for this host }
+        '409': { description: Event ID conflict with different payload }
+        '413': { description: Payload too large }
+        '429': { description: Rate limit exceeded }
+  /api/v1/security-events:
+    get:
+      operationId: readSecurityEventFeed
+      summary: Read latest normalized server security events using a read-only credential
+      security:
+        - MonitorBearer: []
+      parameters:
+        - $ref: '#/components/parameters/DeviceID'
+        - name: limit
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 100, default: 100 }
+      responses:
+        '200':
+          description: Newest events first; secret fields must not be included
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityFeedResponse'
+        '401': { description: Invalid or revoked monitor credential }
+        '403': { description: Credential does not have feed-read permission }
+        '429': { description: Rate limit exceeded }
+  /api/v1/response-actions:
+    get:
+      operationId: readResponseActionStatus
+      summary: Read queued/active/expired temporary host response actions
+      security:
+        - MonitorBearer: []
+      parameters:
+        - $ref: '#/components/parameters/DeviceID'
+        - name: limit
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+      responses:
+        '200': { description: Response status list; no secret tokens returned }
+        '401': { description: Invalid or revoked monitor credential }
+    post:
+      operationId: queueTemporarySSHSourceBlock
+      summary: Queue a bounded UFW temporary block request for a recent direct SSH failure IP
+      security:
+        - ResponseBearer: []
+      parameters:
+        - $ref: '#/components/parameters/DeviceID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action, source_ip, ttl_seconds, reason, confirmation]
+              properties:
+                action: { type: string, const: TEMP_BLOCK_IP }
+                source_ip: { type: string, format: ipv4 }
+                ttl_seconds: { type: integer, enum: [300, 900, 1800] }
+                reason: { type: string, minLength: 8, maxLength: 180 }
+                confirmation: { type: string, description: 'Must exactly equal BLOCK followed by the canonical IP' }
+      responses:
+        '202': { description: Request queued; does not mean a firewall rule is active }
+        '400': { description: Invalid action, IP, TTL, reason, or confirmation }
+        '401': { description: Invalid or revoked response credential }
+        '403': { description: Response actions disabled or IP allowlisted }
+        '409': { description: No recent direct SSH authentication failure event for the target IP, or duplicate pending/active action }
+        '503': { description: Administrator allowlist is missing or invalid }
+components:
+  securitySchemes:
+    DeviceBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: PerDeviceOpaqueToken
+    SensorBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: PerHostWriteOnlyToken
+    MonitorBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: ReadOnlyMonitoringToken
+    ResponseBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: DedicatedResponseToken
+  parameters:
+    HostID:
+      name: X-KAWAL-Host-ID
+      in: header
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 128 }
+    DeviceID:
+      name: X-KAWAL-Device-ID
+      in: header
+      required: true
+      schema:
+        type: string
+        minLength: 8
+        maxLength: 128
+  schemas:
+    SecurityEvent:
+      type: object
+      required: [event_id, timestamp_utc, host_id, source, event_type, actor, source_ip, details]
+      properties:
+        event_id: { type: string, pattern: '^[0-9a-f]{64}$' }
+        timestamp_utc: { type: string, format: date-time }
+        host_id: { type: string, minLength: 1, maxLength: 128 }
+        source: { type: string, maxLength: 64 }
+        event_type:
+          type: string
+          enum: [AUTH_FAILURE, AUTH_SUCCESS, PRIVILEGE_USE, FILE_CHANGE, SERVICE_CHANGE, WEB_AUTH_FAILURE, WEB_AUTH_SUCCESS, API_AUTH_FAILURE, API_AUTH_SUCCESS, AGENT_HEALTH, CUSTOM_SECURITY_EVENT, MALWARE_DETECTED]
+        actor: { type: string, maxLength: 128 }
+        source_ip: { type: string, maxLength: 64 }
+        details:
+          type: object
+          properties:
+            path: { type: string, maxLength: 256 }
+            auth_method: { type: string, maxLength: 256 }
+            reason: { type: string, maxLength: 256 }
+            service: { type: string, maxLength: 256 }
+            command_basename: { type: string, maxLength: 256 }
+            uid: { type: string, maxLength: 256 }
+            rule_key: { type: string, maxLength: 256 }
+            message_excerpt: { type: string, maxLength: 256 }
+            result: { type: string, maxLength: 256 }
+            signature_name: { type: string, maxLength: 256 }
+          additionalProperties: false
+    SecurityBatchRequest:
+      type: object
+      required: [schema_version, host_id, sent_at_utc, events]
+      properties:
+        schema_version: { type: integer, const: 1 }
+        host_id: { type: string, minLength: 1, maxLength: 128 }
+        sent_at_utc: { type: string, format: date-time }
+        events:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items: { $ref: '#/components/schemas/SecurityEvent' }
+    SecurityBatchAck:
+      type: object
+      required: [accepted_event_ids]
+      properties:
+        accepted_event_ids:
+          type: array
+          maxItems: 100
+          items: { type: string, pattern: '^[0-9a-f]{64}$' }
+    SecurityFeedResponse:
+      type: object
+      required: [events]
+      properties:
+        events:
+          type: array
+          maxItems: 100
+          items: { $ref: '#/components/schemas/SecurityEvent' }
+    AuditEvent:
+      type: object
+      required: [event_id, device_id, seq, timestamp_utc, event_type, actor, source, details, previous_hash, record_hash]
+      properties:
+        event_id: { type: string, pattern: '^[0-9a-f]{64}$' }
+        device_id: { type: string }
+        seq: { type: integer, minimum: 1 }
+        timestamp_utc: { type: string, format: date-time }
+        event_type: { type: string }
+        actor: { type: string, maxLength: 80 }
+        source: { type: string, maxLength: 120 }
+        details: { type: object }
+        previous_hash: { type: string, pattern: '^[0-9a-f]{64}$' }
+        record_hash: { type: string, pattern: '^[0-9a-f]{64}$' }
+    BatchRequest:
+      type: object
+      required: [schema_version, app_version, device_id, batch_id, sent_at_utc, first_seq, last_seq, previous_ack_seq, previous_ack_hash, events]
+      properties:
+        schema_version: { type: integer, const: 1 }
+        app_version: { type: string }
+        device_id: { type: string }
+        batch_id: { type: string, pattern: '^[0-9a-f]{64}$' }
+        sent_at_utc: { type: string, format: date-time }
+        first_seq: { type: integer, minimum: 1 }
+        last_seq: { type: integer, minimum: 1 }
+        previous_ack_seq: { type: integer, minimum: 0 }
+        previous_ack_hash: { type: string, pattern: '^[0-9a-f]{64}$' }
+        events:
+          type: array
+          minItems: 1
+          maxItems: 500
+          items: { $ref: '#/components/schemas/AuditEvent' }
+    BatchAck:
+      type: object
+      required: [accepted_through_seq, head_hash]
+      properties:
+        accepted_through_seq: { type: integer, minimum: 0 }
+        head_hash: { type: string, pattern: '^[0-9a-f]{64}$' }
+        accepted_count: { type: integer, minimum: 0 }
