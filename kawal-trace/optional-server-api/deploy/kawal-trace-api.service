@@ -1,0 +1,61 @@
+[Unit]
+Description=Kawal-Trace isolated telemetry API
+After=network.target
+
+[Service]
+Type=simple
+User=kawal-trace-api
+Group=kawal-trace-api
+EnvironmentFile=/etc/kawal-trace/api.env
+ExecStart=/usr/bin/python3 /opt/kawal-trace-api/server.py
+Restart=on-failure
+RestartSec=3
+StateDirectory=kawal-trace-api
+StateDirectoryMode=0750
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+LockPersonality=true
+MemoryDenyWriteExecute=true
+UMask=0077
+
+# --- Additional hardening (API 1.5.1) -------------------------------------------------------------------
+# The API is an unprivileged, loopback-only service that only reads/writes its own SQLite file: it needs no
+# capabilities, no other processes' /proc entries, no namespaces, and never makes an outbound connection.
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectProc=invisible
+ProcSubset=pid
+ProtectClock=true
+ProtectHostname=true
+ProtectKernelLogs=true
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+SystemCallArchitectures=native
+RemoveIPC=true
+# Only loopback peers (cloudflared on this host) may talk to the API, and it may talk to nobody else: a
+# compromised process cannot send data out to the Internet. (Needs cgroup BPF support; harmless if absent.)
+IPAddressDeny=any
+IPAddressAllow=localhost
+# One thread per connection: this caps a connection flood before it can exhaust the machine.
+TasksMax=512
+# System-call allow-list. Measured, not guessed: the whole API test suite (HTTP, SSE stream, SQLite, loopback) was run
+# under strace (as root, Python 3.13, in a development container) and every call it makes is inside '@system-service'
+# minus '@privileged @resources', except one: fchown(), which SQLite issues only when the process runs as root (to copy
+# the database owner onto its journal) and ignores if it fails, so this unprivileged service is unaffected. Your server
+# may differ: repeat the measurement there with deploy/check_syscalls.py. A blocked call returns EPERM instead of
+# killing the process, so a miss shows up as a PermissionError in `journalctl -u kawal-trace-api`. If that happens after
+# an OS/Python update, comment out these three lines, restart, and report the call.
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+SystemCallErrorNumber=EPERM
+
+[Install]
+WantedBy=multi-user.target

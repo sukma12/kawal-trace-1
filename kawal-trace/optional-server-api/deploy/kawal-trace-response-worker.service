@@ -1,0 +1,47 @@
+[Unit]
+Description=Kawal-Trace temporary UFW response worker (explicitly gated)
+After=network.target kawal-trace-api.service ufw.service
+Requires=kawal-trace-api.service
+
+[Service]
+Type=simple
+User=root
+Group=kawal-trace-api
+EnvironmentFile=/etc/kawal-trace/api.env
+ExecStart=/usr/bin/python3 /opt/kawal-trace-api/response_worker.py
+Restart=on-failure
+RestartSec=3
+UMask=0007
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=full
+# `ProtectSystem=full` makes /etc read-only, but `ufw` must write its rule files in /etc/ufw (and /lib/ufw is a
+# symlink farm into it). Without these paths every rule change would fail with "read-only file system". The leading
+# '-' makes systemd skip a path that does not exist instead of refusing to start. NOT verified on a real host
+# (UFW was not available where this was written): after enabling response actions, test one block end to end and
+# read `journalctl -u kawal-trace-response-worker` for "ufw_rule_add_failed".
+ReadWritePaths=-/etc/ufw -/lib/ufw -/usr/lib/ufw -/var/lib/ufw
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX AF_NETLINK
+LockPersonality=true
+MemoryDenyWriteExecute=true
+# The worker runs as root only to drive UFW, so it keeps its capabilities (UFW/iptables need several, and which ones
+# differs between iptables-nft and iptables-legacy: restricting them untested could silently disable enforcement).
+# AF_NETLINK above is required by iptables-nft (the default on current Ubuntu); the lines below remove only
+# things UFW does not need.
+ProtectClock=true
+ProtectHostname=true
+ProtectKernelLogs=true
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+SystemCallArchitectures=native
+RemoveIPC=true
+TasksMax=128
+
+[Install]
+WantedBy=multi-user.target
