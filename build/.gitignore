@@ -1,0 +1,42 @@
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+.flet/
+build/
+*.py[cod]
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
+exports/
+identity.sqlite3*
+monitor-root.txt
+
+# Per-device endpoint configuration; never commit runtime settings
+sync-settings.json
+
+# Server agent runtime and local credentials
+server_agent/agent.env
+*.outbox.sqlite3
+.env
+.env.local
+
+# Local server profiles (endpoint metadata; never commit deployment config)
+server-registry.json
+sync-state-*.sqlite3
+
+dist/
+
+# Deployment secret files (examples/placeholders may be committed, real values may not)
+.env
+.env.*
+!.env.example
+*.env
+!*.env.example
+
+# Encrypted local backups and scanner runtime data never belong in the repository
+*.ktbak
+*.bloom
+backups/
+scanner/
+restore-safety-*/

@@ -1,0 +1,59 @@
+[project]
+name = "kawaltrace"
+version = "1.0.2"
+description = "Tamper-evident audit, Windows Event Log monitoring, E2EE server sync and controlled defensive response"
+readme = "README.md"
+requires-python = ">=3.13,<3.15"
+dependencies = ["flet[all]==1.0.4", "httpx>=0.28.1,<1", "flet-secure-storage==1.0.4", "flet-notifications==0.1.4", "flet-audio==1.0.4", "flet-local-auth>=1.0.4,<2", "cryptography==43.0.1", "defusedxml>=0.7.1,<1", "websockets>=15,<17"]
+
+[project.optional-dependencies]
+ssh = ["paramiko>=3.5,<5"]
+mysql = ["PyMySQL>=1.1.1,<2"]
+sqlserver = ["pyodbc>=5,<6"]
+connectors = ["paramiko>=3.5,<5", "PyMySQL>=1.1.1,<2"]
+# Development-only extras for the offline scanner: retraining the model, the optional loopback API, and bs4 parsing.
+# The packaged app does not need them: it runs the portable JSON model and falls back to the standard-library parsers.
+scanner-dev = ["scikit-learn>=1.5,<2", "joblib>=1.4,<2", "beautifulsoup4>=4.12,<5", "flask>=3,<4"]
+
+[tool.flet]
+# Internal Android versionCode/build number must increase even while the display version stays 1.0.
+build_number = 14
+product = "Kawal Trace"
+company = "Kawal Trace"
+org = "id.kawaltrace"
+copyright = "Copyright (c) 2026 Kawal Trace"
+
+[tool.flet.app]
+path = "."
+module = "main.py"
+assets_dir = "assets"
+
+[tool.flet.android]
+min_sdk_version = 24
+
+[tool.flet.android.permission]
+"android.permission.POST_NOTIFICATIONS" = true
+"android.permission.INTERNET" = true
+"android.permission.USE_BIOMETRIC" = true
+# Lets the scanner read and delete files in shared storage (Downloads, ...) on Android 11+. Declaring it grants nothing by
+# itself: the user must switch on "All files access" for Kawal Trace in system settings. Without it only files inside the
+# app's own storage can be scanned and deleted. Android 10 and older need other (legacy) permissions that are not declared.
+# Google Play restricts this permission; a sideloaded APK is not affected.
+"android.permission.MANAGE_EXTERNAL_STORAGE" = true
+
+[tool.flet.android.app]
+# Keep the APK focused on the runtime app: omit test/docs/server-side tools.
+exclude = [
+  "tests", "docs", "server_agent", "windows_agent", "optional-server-api",
+  "scripts", "installer", "README.md", "CHANGELOG.md", "Panduan.txt", "CARA_PAKAI.txt",
+  "BUILD_ANDROID_WINDOWS.cmd", "BUILD_ANDROID_APK.cmd", "build_windows.bat",
+  "install_windows.bat", "run_windows.bat", "JALANKAN_APLIKASI.bat",
+  "requirements.txt", "requirements-dev.txt",
+  # Training-time files: the app uses ml_models/phishing_model.json (+ manifest); the pickle is never loaded at runtime.
+  "ml_models/train_model.py", "ml_models/training_corpus.py", "ml_models/phishing_model.pkl", "detectors/local_api.py"
+]
+
+[tool.pytest.ini_options]
+# Lets a bare `pytest` find chainlog/, detectors/ and main.py the same way `python -m pytest` does.
+pythonpath = ["."]
+testpaths = ["tests"]
