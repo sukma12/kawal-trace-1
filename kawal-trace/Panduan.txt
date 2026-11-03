@@ -1,0 +1,800 @@
+KAWAL TRACE
+SPESIFIKASI PERUBAHAN MENYELURUH — LOCAL-FIRST / OFFLINE / TANPA AKUN EMAIL
+Versi dokumen: 2.0
+Tanggal: 27 Oktober 2026
+Status: Dokumen persyaratan implementasi; bukan klaim bahwa seluruh fitur sudah diterapkan.
+
+====================================================================
+0. ATURAN PALING PENTING: DATA TETAP DI PERANGKAT
+====================================================================
+
+Kawal Trace adalah aplikasi local-first. Seluruh profil pengguna, konfigurasi target, kredensial yang disimpan, riwayat pemeriksaan, event keamanan yang diterima, rantai hash, hasil analisis, laporan, cache, dan pengaturan harus disimpan secara lokal di perangkat tempat aplikasi berjalan.
+
+WAJIB:
+1. Jangan mewajibkan pendaftaran akun online.
+2. Jangan meminta email untuk membuat akun, masuk, pemulihan, atau memakai fitur lokal.
+3. Jangan mengirim data, log, konfigurasi, daftar target, kredensial, laporan, atau statistik penggunaan ke server milik pengembang Kawal Trace.
+4. Jangan memakai database cloud, layanan SaaS, cloud sync, akun pusat, telemetri, analytics, crash reporting online, atau push notification cloud secara default.
+5. Jangan mengirim log pengguna ke layanan pihak ketiga. Semua analisis, penyimpanan, pencarian, dan pembuatan laporan dilakukan di perangkat.
+6. Jangan mengunggah backup secara otomatis. Ekspor/impor backup harus dilakukan manual oleh pengguna ke lokasi yang dipilih.
+7. Jangan mewajibkan Cloudflare Tunnel, endpoint milik pengembang, atau backend Kawal Trace yang di-host pihak lain untuk menjalankan aplikasi lokal.
+8. Jangan membuat koneksi jaringan diam-diam. Semua koneksi keluar harus terkait dengan target yang dipilih pengguna dan dijelaskan dalam UI.
+9. Jangan mengumpulkan telemetry. Jika suatu fitur opsional yang memerlukan jaringan tambahan kelak dirancang, fitur tersebut harus nonaktif secara default, eksplisit, terpisah, dan tidak mengirim data pribadi atau log tanpa persetujuan yang jelas.
+10. Jangan memasukkan akun email, remote sign-in, cloud database, atau login online ke desain baru.
+
+PENTING TENTANG MAKNA OFFLINE:
+- Data aplikasi tetap lokal dan tidak dikirim ke cloud Kawal Trace.
+- Mode lokal, audit lokal, pencarian log lokal, laporan, dan pengaturan harus tetap berjalan tanpa internet.
+- Memantau website publik, menghubungkan database remote, SSH, API, atau server remote tentu membutuhkan jalur jaringan ke target tersebut. Itu adalah koneksi yang diminta pengguna ke target, bukan sinkronisasi aplikasi ke cloud pengembang.
+- Jika perangkat benar-benar tidak memiliki koneksi jaringan, aplikasi tidak bisa memeriksa website remote atau mengambil log dari server remote pada saat itu. Aplikasi tetap dapat menampilkan data lokal dan memproses log yang telah diimpor.
+- Jangan menyebut aplikasi "tanpa jaringan sama sekali" jika fitur pemeriksaan target remote sedang aktif. Gunakan istilah "penyimpanan lokal, tanpa akun/cloud Kawal Trace".
+
+DEFAULT STORAGE:
+- Semua data target dan hasil pemeriksaan disimpan pada perangkat.
+- Kredensial disimpan melalui secure storage sistem operasi, bukan dalam teks biasa di database atau file konfigurasi.
+- Event lokal ditulis ke database lokal terenkripsi atau ke penyimpanan lokal yang dilindungi sesuai platform.
+- Backup dienkripsi dan hanya dibuat saat pengguna memilih Ekspor Backup.
+- Tidak boleh ada server pengembang sebagai titik wajib untuk menjalankan aplikasi.
+
+====================================================================
+1. TUJUAN PRODUK
+====================================================================
+
+Perbarui Kawal Trace agar dapat bekerja dengan berbagai jenis target dari satu aplikasi: website publik, server Linux, server Windows, MySQL, MariaDB, Microsoft SQL Server, sumber syslog/perangkat jaringan, SIEM/collector yang sudah ada, API log, dan layanan cloud yang didukung.
+
+Tujuan bukanlah membaca semua log internal server hanya dari URL. Tujuan adalah memberikan metode koneksi yang sesuai dengan tipe target, menyimpan hasilnya secara lokal, dan menjelaskan secara jujur data apa yang benar-benar dapat diakses.
+
+TIGA KELAS DATA YANG WAJIB DIPISAHKAN:
+A. Website Monitoring Event: hasil pemeriksaan dari luar seperti HTTP status, waktu respons, DNS, TLS, timeout, dan perubahan halaman yang terlihat publik.
+B. Security Log Event: peristiwa yang benar-benar berasal dari sumber log/audit yang diberikan secara sah, misalnya OS, database audit, web server, firewall, atau API log.
+C. Connector/Agent Health Event: status koneksi, autentikasi, agen, feed, collector, sinkronisasi lokal, atau kesalahan integrasi.
+
+Jangan menganggap status website HTTP 200 sebagai bukti server aman. Jangan menyebut website berhasil dipantau sebagai log keamanan internal berhasil diterima. Jangan menyebut suatu fitur tersedia sebelum kode, UI, penyimpanan, tes, dan jalur end-to-end selesai diimplementasikan.
+
+====================================================================
+2. KONDISI KODE LAMA DAN STRATEGI MIGRASI
+====================================================================
+
+Acuan sumber sebelumnya adalah Kawal Trace v2.4.1 yang memakai Python/Flet dan mempunyai komponen yang berhubungan dengan UI, konektor, audit lokal/hash chain, profil server, Secure Storage, agen Linux/Windows, serta backend API opsional. Nama dan isi file yang disebut di bagian ini harus dicek kembali pada source code TERBARU sebelum perubahan dilakukan.
+
+Bagian lama yang perlu dipertahankan jika masih ada dan telah berfungsi:
+- UI dan tampilan terbaru yang sedang digunakan pengguna.
+- Audit lokal dan hash chain.
+- Deteksi/normalisasi event keamanan.
+- Riwayat aktivitas, notifikasi lokal, ekspor laporan, arsip, dan pengaturan.
+- Profil multi-target yang sudah ada.
+- Universal API Adapter dan pemetaan event yang sudah tersedia.
+- Kawal Trace API/agent/backend lama untuk instalasi yang benar-benar membutuhkannya, tetapi jangan menjadikannya layanan online wajib.
+- Secure Storage, backup, dan fitur perlindungan yang sudah ada.
+- Agen Linux dan Windows yang ada, setelah alur pemasangan dan pengumpulan data diuji.
+
+ATURAN MIGRASI:
+1. Jangan langsung menghapus/menulis ulang semua kode lama.
+2. Audit source code terbaru terlebih dahulu; buat inventaris modul, fiturnya, tes, dependensi dan penyimpanannya.
+3. Buat baseline tes sebelum perubahan.
+4. Pisahkan UI, domain/use-case, konektor, penyimpanan lokal, dan perlindungan kredensial.
+5. Porting bahasa/arsitektur dilakukan bertahap dengan tes parity agar fitur lama tidak hilang.
+6. Jangan mengklaim semua konektor tersedia jika baru dibuat di spesifikasi.
+7. Jangan mengubah tema/tampilan baru, logo, nama produk, atau navigasi yang tidak berkaitan dengan perubahan koneksi.
+
+====================================================================
+3. STACK PEMROGRAMAN DAN TOOLS YANG DIREKOMENDASIKAN
+====================================================================
+
+ARAH TEKNOLOGI TARGET:
+1. UI lintas platform: Flutter dan Dart stable yang telah dipin versinya serta diuji pada Windows/Android.
+2. Core keamanan yang sensitif: Rust dapat dipakai bertahap untuk parser event, validasi protokol, fungsi hash/audit, dan bagian yang memerlukan memory safety. Jangan memindahkan seluruh kode ke Rust sebelum ada tes parity.
+3. Penyimpanan lokal: SQLite sebagai basis data lokal; gunakan SQLCipher atau metode enkripsi database setara yang diuji jika kebutuhan perlindungan data-at-rest mengharuskannya.
+4. Kredensial: Windows Credential Manager/DPAPI di Windows; Android Keystore melalui secure storage yang sesuai di Android; Keychain di macOS jika mendukung platform tersebut. Jangan membuat format penyimpanan rahasia sendiri tanpa alasan kuat.
+5. Koneksi jaringan: HTTPS/TLS untuk website/API/collector; SSH melalui implementasi/library yang terawat untuk akses yang diizinkan; protokol database hanya pada konektor yang sungguh diimplementasikan.
+6. Agen Linux: service non-root jika memungkinkan, systemd dan pembacaan log dengan hak minimum.
+7. Agen Windows: Windows Service dan Windows Event Log dengan izin minimum.
+8. Tes: unit test, integration test dengan fixture lokal, mock server lokal, tes keamanan kredensial, dan tes regresi untuk semua fitur lama.
+9. Kontrol versi: Git; kunci versi toolchain dan dependensi; gunakan lockfile.
+10. Desain/flow: Mermaid untuk flowchart/diagram, Figma atau alat wireframe setara untuk mockup/prototype. Desain visual tidak boleh menggantikan tes alur nyata.
+
+TOOLS PENGEMBANGAN:
+- Flutter SDK dan Dart SDK versi stable yang kompatibel, dipin untuk build.
+- Android SDK/Build Tools dan JDK yang cocok dengan Gradle serta Flutter yang dipakai proyek.
+- Rust toolchain stable dan Cargo hanya untuk modul yang benar-benar dipindahkan ke Rust.
+- Git untuk version control.
+- SQLite/SQLCipher untuk store lokal.
+- Penguji API lokal dan test fixtures untuk menguji konektor tanpa mengirim data ke layanan publik.
+- Dependency audit tool yang sesuai ekosistem, misalnya cargo-audit untuk Cargo dan pemeriksaan dependensi yang sesuai untuk Dart/Flutter/Python.
+- Formatter/linter/compiler checks: dart format, flutter analyze, cargo fmt, cargo clippy; Python formatter/type checker hanya bila modul Python tetap dipakai.
+- Figma/Balsamiq/diagram sebagai tools desain opsional.
+
+MIGRASI BAHASA:
+- Jangan memaksa rewrite sekaligus hanya karena ingin memakai bahasa baru.
+- Jika source saat ini adalah Python/Flet, pertahankan runtime yang sudah berjalan sampai versi Flutter/Dart mencapai feature parity dan lolos tes.
+- Target jangka panjang dapat memakai Flutter/Dart untuk UI dan Rust untuk core keamanan, tetapi dokumentasikan bridge antarbagian dan tesnya.
+- Jangan memperkenalkan Flutter + React Native + Python + Rust sekaligus tanpa pembagian tanggung jawab; hindari arsitektur campur aduk.
+- Jangan menyimpan business logic di widget UI atau satu file raksasa.
+
+====================================================================
+4. ARSITEKTUR APLIKASI — LOCAL-FIRST
+====================================================================
+
+Gunakan pemisahan berlapis yang setara dengan Clean Architecture atau MVC yang konsisten:
+
+A. Presentation/UI
+- Halaman, komponen, navigasi, state dan pesan pengguna.
+- Tidak boleh menyimpan kredensial sendiri atau menjalankan query SQL langsung dari widget.
+
+B. Domain / Use Cases
+- AddTarget, ValidateTarget, TestWebsite, TestApiFeed, RegisterAgent, TestDatabaseAuditSource, StartMonitor, StopMonitor, SearchLocalEvents, ExportReport, ImportBackup.
+- Validasi input dilakukan sebelum konektor dijalankan.
+
+C. Connectors / Infrastructure
+- Website monitor, API adapter, database audit source, SSH read-only jika tersedia, syslog/SIEM, agent transport.
+- Setiap konektor memiliki kontrak, timeout, status, diagnosa, dan tes tersendiri.
+- Konektor tidak boleh menyalin seluruh data ke luar perangkat kecuali pengguna secara eksplisit mengarahkan ke collector yang dikelola organisasi.
+
+D. Local Data Layer
+- SQLite/SQLCipher untuk profil, pemeriksaan, event, hasil, setting, riwayat dan metadata.
+- Secure storage OS untuk token/kredensial/key encryption.
+- Log teknis lokal tanpa secret.
+
+E. Security Core
+- Validasi input, normalisasi event, hash-chain/audit lokal, kontrol akses lokal, enkripsi dan redaksi data sensitif.
+
+F. Platform Adapter
+- Windows: Credential Manager/DPAPI, Windows Event Log bila dibutuhkan, Windows service/installer.
+- Android: Android Keystore, lifecycle, izin dan penyimpanan lokal.
+- Linux (agen/collector sesuai target): systemd, permission, journal/audit sources.
+
+Tidak boleh ada layer wajib yang mengarah ke backend/akun online milik pengembang untuk membuka aplikasi, membaca database lokal, melihat laporan atau menjalankan fitur yang bisa dilakukan secara lokal.
+
+====================================================================
+5. FLOWCHART PENGGUNA DAN WORKFLOW
+====================================================================
+
+FLOW UTAMA:
+Mulai aplikasi
+  -> Inisialisasi penyimpanan lokal
+  -> Verifikasi integritas migrasi database lokal
+  -> Jika pengguna mengaktifkan kunci aplikasi: minta PIN/password lokal/biometrik perangkat
+  -> Dashboard lokal
+  -> Tambah Target
+  -> Pilih tipe target
+      A. Website Publik
+      B. Server/Log via Agent
+      C. SSH read-only
+      D. Database Audit Source
+      E. Collector/SIEM/Syslog
+      F. Universal API Adapter
+  -> Validasi parameter dan izin
+  -> Uji koneksi yang sesuai
+  -> Tampilkan hasil terperinci
+  -> Simpan konfigurasi secara lokal
+  -> Mulai pemeriksaan/pengambilan data
+  -> Simpan hasil ke local database
+  -> Dashboard/riwayat/notifikasi lokal
+  -> Ekspor laporan secara manual jika diminta
+  -> Tutup aplikasi
+
+ALUR OFFLINE:
+- Jika tidak ada jaringan, semua data lokal tetap dapat dibuka dan dianalisis.
+- Pemeriksaan website/API/database remote ditandai “tidak dapat diuji saat offline”, bukan dianggap gagal permanen.
+- Agen/remote connector tidak dapat mengirim/ambil data tanpa jalur jaringan. Event yang sudah tersimpan tetap tersedia.
+- Jangan menunggu koneksi ke server pengembang karena tidak ada backend online wajib.
+
+ALUR DESAIN:
+1. Wireframe untuk seluruh alur.
+2. Flowchart/diagram data.
+3. UI mockup yang konsisten dengan tampilan terbaru.
+4. Prototype untuk memeriksa navigasi dan status.
+5. Implementasi domain/data/konektor.
+6. Tes unit dan tes integrasi dengan mock server/database lokal.
+7. Tes offline dan keamanan.
+8. Build per platform.
+9. Uji instalasi, update manual dan pemulihan backup.
+
+====================================================================
+6. MENU KONEKSI BARU: JENIS TARGET DAN METODENYA
+====================================================================
+
+Tambahkan wizard “Tambah Target” dengan mode berikut. Masing-masing mode menampilkan kolom yang relevan saja.
+
+A. PANTAU WEBSITE PUBLIK — URL-ONLY
+B. KAWAL TRACE AGENT — LINUX
+C. KAWAL TRACE AGENT — WINDOWS
+D. SSH READ-ONLY — OPSIONAL
+E. DATABASE AUDIT SOURCE — MYSQL/MARIADB/SQL SERVER
+F. COLLECTOR / SIEM / SYSLOG YANG SUDAH ADA
+G. UNIVERSAL API ADAPTER — READ-ONLY
+H. KAWAL TRACE API/AGENT BACKEND LOKAL/ORGANISASI, jika memang dipasang dan dikelola oleh pengguna/organisasi
+
+Jangan tampilkan seluruh formulir sekaligus. Wizard memilih mode dahulu; baru tampilkan field, autentikasi, tes dan hasil yang relevan.
+
+====================================================================
+7. MODE A — PANTAU WEBSITE PUBLIK
+====================================================================
+
+TUJUAN:
+Memeriksa website dari luar tanpa token/API log. Contoh URL: https://example.org/ atau https://example.org/home.
+
+INPUT:
+- Nama target.
+- URL HTTP/HTTPS.
+- Interval pemeriksaan.
+- Timeout.
+- Ambang kegagalan berurutan sebelum alarm.
+- Opsi pemeriksaan sertifikat.
+- Opsi fingerprint/perubahan konten publik (opsional dan nonaktif secara default).
+- Tag/grup.
+
+ALUR:
+Tambah Target -> Pantau Website Publik -> masukkan URL -> Validasi -> Uji Website -> lihat hasil -> Simpan Target -> Mulai Pantau.
+
+PEMERIKSAAN:
+- DNS resolution.
+- HTTP status/redirect yang aman.
+- waktu DNS/connect/TLS/total.
+- validitas sertifikat HTTPS dan tanggal kedaluwarsa.
+- timeout dan error kategori koneksi.
+- status recover setelah gangguan.
+- optional hash/fingerprint konten publik tanpa menyimpan body penuh secara default.
+
+BATAS:
+- Bukan security log internal.
+- Tidak membaca file server, database, admin session, login internal atau filesystem.
+- Jangan scan port atau mencoba kredensial.
+- Jangan melakukan exploit/path guessing.
+- Jangan mengirim cookie/session pengguna.
+
+PENGAMANAN TARGET:
+- Izinkan hanya HTTP/HTTPS.
+- Karena aplikasi desktop secara eksplisit digunakan untuk memantau server, alamat internal dapat dipakai hanya lewat pilihan internal-target yang jelas dan dikonfirmasi pengguna/admin lokal; jangan jadikan website publik sebagai cara untuk memindai jaringan yang tidak diminta.
+- Jika ada URL yang diperoleh dari sumber eksternal, jangan mengakses localhost, loopback, link-local, metadata cloud, atau alamat internal tanpa allowlist eksplisit.
+- Validasi setiap redirect dan resolusi DNS; batasi redirect, ukuran body, concurrency, timeout dan frekuensi.
+- Mencegah SSRF jika mode ini kelak dijalankan melalui service/collector.
+
+EVENT:
+WEBSITE_UP, WEBSITE_DOWN, WEBSITE_HTTP_ERROR, WEBSITE_DNS_ERROR, WEBSITE_TLS_ERROR, WEBSITE_TIMEOUT, WEBSITE_CONTENT_CHANGED (opsional), WEBSITE_RECOVERED.
+
+HASIL:
+Tampilkan “Website dapat diakses”, “HTTP 404”, “TLS invalid”, “DNS gagal”, “Timeout”, dan sebagainya. Jangan tampilkan “Server aman” dari pemeriksaan ini.
+Simpan event ini sebagai Website Monitoring Event di perangkat.
+
+====================================================================
+8. MODE B — KAWAL TRACE AGENT LINUX
+====================================================================
+
+TUJUAN:
+Mengumpulkan log lokal dari server Linux yang dikelola atau secara eksplisit mengizinkan monitoring. Pemilik tidak perlu mengubah kode website atau membuat API sendiri.
+
+SUMBER YANG DAPAT DIDUKUNG SETELAH DIIMPLEMENTASIKAN DAN DIUJI:
+- systemd journal.
+- auth.log/secure log sesuai distribusi.
+- auditd log jika auditd aktif dan izin baca benar.
+- NGINX/Apache access/error log jika izin tersedia.
+- perubahan file/path yang dipilih administrator.
+- status service dan heartbeat agen.
+
+ALUR:
+1. Tambah server yang diizinkan.
+2. Buat proses enrollment lokal/manual yang terbatas, sekali pakai dan bisa dicabut. Tidak perlu email atau akun online.
+3. Installer memeriksa OS/arsitektur, membuat service dengan hak minimum, mengatur izin log dan membuat konfigurasi lokal.
+4. Agen dan aplikasi/collector berpasangan memakai alamat collector yang dipilih pengguna dan tersedia di LAN/VPN/direct route. Tidak ada relay cloud Kawal Trace wajib.
+5. Selesaikan pengesahan agen menggunakan kode/secret sekali pakai yang dibuat lokal oleh administrator, atau metode trust alternatif yang terdokumentasi.
+6. Agen membaca log yang benar-benar diaktifkan dan disetujui.
+7. Event dikirim melalui kanal TLS langsung ke alamat Kawal Trace/collector milik pengguna yang bisa dijangkau, atau aplikasi menarik data secara aman melalui metode yang diimplementasikan.
+8. Jika jaringan putus, antrekan lokal dibatasi ukuran/retensi; saat koneksi tersedia, kirim ulang dengan idempotency dan acknowledgement.
+9. Status agen, versi, last-seen, pending events dan error ditampilkan.
+
+LOCAL-ONLY NETWORK MODEL:
+- Untuk data tetap berada pada perangkat aplikasi, gunakan pull melalui SSH/API yang sah, atau kirim ke collector lokal milik pengguna yang memang dipilih dan dikelola pengguna.
+- Jika agen harus mengirim langsung ke aplikasi, perangkat aplikasi perlu dapat dijangkau melalui LAN/VPN dan endpoint lokal yang aman. Jangan mengklaim agent dapat mengirim dari internet melewati NAT tanpa jalur koneksi yang disediakan.
+- Jangan mengirim event ke server cloud Kawal Trace.
+
+PERLINDUNGAN:
+- Jangan menggunakan root sebagai default; gunakan service account non-root jika mungkin.
+- Batasi file/path yang dibaca.
+- Proteksi file konfigurasi/secret dengan permission OS.
+- Autentikasi perangkat yang unik, rotasi/revokasi, TLS yang diverifikasi.
+- Jangan mencatat token dalam log.
+- Service tidak boleh menjalankan perintah shell dari input jaringan tanpa allowlist.
+
+====================================================================
+9. MODE C — KAWAL TRACE AGENT WINDOWS
+====================================================================
+
+TUJUAN:
+Mengumpulkan event Windows yang diizinkan tanpa mengubah kode website.
+
+SUMBER YANG BISA DIDUKUNG SESUAI IMPLEMENTASI:
+- Windows Event Log/channel yang dipilih administrator.
+- event keamanan yang akun agen boleh baca.
+- status layanan dan kesehatan agen.
+- file change monitoring yang eksplisit dikonfigurasi, jika modulnya tersedia.
+
+ALUR:
+1. Administrator menyetujui target dan installer.
+2. Install service sesuai policy organisasi.
+3. Pilih Event Log/channel dan rentang event yang diizinkan.
+4. Enrollment lokal/manual tanpa email.
+5. Hubungkan ke aplikasi/collector milik pengguna melalui LAN/VPN/direct route yang diizinkan.
+6. Uji baca event lokal dan uji koneksi secara terpisah.
+7. Tampilkan last-seen, event pending, dan error.
+
+JANGAN:
+- mengaktifkan akses semua Security Log tanpa izin;
+- meminta hak admin penuh jika tidak perlu;
+- menyimpan token dalam teks biasa;
+- menjadikan internet/akun online sebagai syarat untuk membuka aplikasi.
+
+====================================================================
+10. MODE D — SSH READ-ONLY
+====================================================================
+
+SSH boleh menjadi opsi koneksi bagi server Linux jika benar-benar diimplementasikan dan diuji. SSH bukan jalur ajaib untuk server yang tidak memberi izin atau tidak dapat dijangkau.
+
+FIELD:
+- label target;
+- hostname/IP dan port;
+- username khusus read-only;
+- metode autentikasi yang didukung (utamakan SSH key yang dikelola aman; jangan meminta key privat dikirim ke chat);
+- known-hosts/host key verification;
+- command/profile pembacaan log yang sudah di-allowlist.
+
+ALUR:
+- validasi host dan port -> verifikasi host key -> autentikasi -> uji menjalankan perintah baca yang diizinkan -> tampilkan status -> simpan profil lokal terenkripsi.
+
+KEAMANAN:
+- jangan nonaktifkan verifikasi host key;
+- jangan menggunakan root default;
+- jangan menjalankan perintah bebas dari field pengguna;
+- jangan mengirim command dengan shell string yang dapat diinjeksi;
+- tidak boleh ada operasi menulis/menghapus/mengubah server dalam mode read-only;
+- dukung revoke credential dan uji ulang;
+- jika SSH tidak tersedia, arahkan ke agen/collector resmi.
+
+====================================================================
+11. MODE E — DATABASE AUDIT SOURCE
+====================================================================
+
+DUKUNGAN TARGET YANG DIMINTA:
+- MySQL
+- MariaDB
+- Microsoft SQL Server
+
+PENTING:
+Koneksi ke database tidak otomatis sama dengan akses ke security audit log. Aplikasi perlu membaca sumber audit yang benar-benar disediakan/diaktifkan oleh administrator.
+
+DESAIN KONEKTOR YANG DISARANKAN:
+A. Metode utama: database menghasilkan audit event ke file, OS Event Log atau syslog; agen/collector yang diizinkan membacanya lalu menyerahkan event ke Kawal Trace.
+B. Metode tambahan: koneksi langsung read-only ke tabel/view khusus audit jika benar-benar tersedia, dokumentasinya ada, driver/transport diuji, TLS diset, dan hak akses akun dibatasi.
+
+FIELD KONEKSI LANGSUNG (HANYA JIKA DIIMPLEMENTASIKAN):
+- jenis database;
+- host/port;
+- database/schema;
+- username khusus read-only;
+- credential di secure storage OS;
+- TLS mode dan validasi sertifikat;
+- daftar tabel/view audit yang disetujui atau query template yang allowlisted;
+- interval polling dan watermark/cursor jika didukung.
+
+PORT DEFAULT UMUM (DAPAT DIUBAH OLEH ADMIN):
+- MySQL: 3306
+- MariaDB: 3306
+- SQL Server: 1433
+
+JANGAN:
+- memakai akun root/sysadmin database sebagai default;
+- menjalankan query perubahan data;
+- membaca seluruh tabel bisnis tanpa kebutuhan;
+- menonaktifkan verifikasi sertifikat TLS;
+- menganggap log database aktif tanpa melakukan pemeriksaan sumber;
+- menyimpan password di file teks atau log.
+
+HASIL:
+DatabaseAuditEvent hanya dibuat dari sumber audit yang valid. Status terpisah: koneksi database, autentikasi, sumber audit aktif, event terbaru, dan error.
+
+====================================================================
+12. MODE F — COLLECTOR / SIEM / SYSLOG
+====================================================================
+
+Dukung collector/SIEM hanya jika protokol dan format yang diperlukan benar-benar diimplementasikan. Jangan menyebut semua SIEM kompatibel tanpa tes.
+
+Pilihan transport dapat mencakup syslog atau integrasi API yang disediakan oleh sistem yang digunakan organisasi. Tentukan format event, TLS atau mekanisme autentikasi, filtering, ukuran batch, cursor, retry, deduplikasi dan acknowledgement.
+
+DEFAULT LOCAL-FIRST:
+- Collector dijalankan pada perangkat/server lokal yang dipilih dan dikelola pengguna, bukan layanan cloud wajib pengembang.
+- Dashboard aplikasi menyimpan data pada perangkat aplikasi.
+- Jika organisasi memilih collector lokal sebagai penyimpanan bersama, tampilkan secara jelas bahwa data dikirim ke perangkat/server organisasi itu. Jangan mengirim data diam-diam.
+- Jangan mengirim ke external SaaS sebagai default.
+
+====================================================================
+13. MODE G — UNIVERSAL API ADAPTER READ-ONLY
+====================================================================
+
+Pertahankan konektor API yang sudah ada dan perluas hanya jika protokol baru benar-benar diimplementasikan.
+
+Dapat mempertahankan/mendukung:
+- REST/JSON;
+- REST pagination;
+- OAuth2 client credentials bila endpoint tersebut mendukungnya;
+- GraphQL query-only;
+- SOAP/XML read-only;
+- WebSocket JSON feed;
+- Bearer token, X-API-Key, custom header, atau no-auth jika memang diizinkan.
+
+FIELD:
+- Base URL API;
+- path/endpoint dokumentasi resmi;
+- HTTP method yang diizinkan (utamakan GET pada mode read-only);
+- tipe protokol;
+- autentikasi;
+- pemetaan field ke skema event;
+- pagination/cursor;
+- interval polling dan timeout.
+
+ALUR:
+Pilih Universal API -> isi Base URL dan endpoint -> set auth jika dibutuhkan -> uji koneksi -> validasi struktur feed -> preview tanpa menulis data remote -> Simpan Profil Lokal -> Mulai Polling -> Simpan event di perangkat.
+
+TOKEN:
+- Jangan minta token pada website monitor publik.
+- API token hanya jika endpoint membutuhkan token.
+- Simpan token melalui secure storage sistem operasi.
+- Masking token pada UI dan jangan pernah menuliskannya ke log, ekspor biasa, crash log, atau layar hasil error.
+
+NO-AUTH:
+- Diperbolehkan jika dokumentasi sumber menyatakan endpoint memang publik.
+- Jangan mencoba melewati autentikasi, mengubah header untuk menyamar, atau menebak endpoint terlindungi.
+
+API DISCOVERY:
+- Cari endpoint hanya pada base URL yang dimasukkan dan dalam batas yang aman.
+- Jangan melakukan port scan, brute force, exploit, atau pencarian jalur admin tersembunyi.
+- Discovery harus terbatas, transparan, rate-limited dan dihentikan saat akses ditolak.
+
+LOCAL DATA:
+- Respons event yang diambil disimpan di perangkat.
+- Jangan mengirim salinan feed ke backend Kawal Trace milik pengembang.
+- Jika target tidak terjangkau saat offline, gunakan data cache lokal dan tampilkan timestamp terakhir.
+
+====================================================================
+14. MODE H — KAWAL TRACE API/AGENT BACKEND
+====================================================================
+
+Pertahankan kontrak Kawal Trace API hanya untuk instalasi/organisasi yang memang menyiapkan backend tersebut dan secara eksplisit memilihnya.
+
+Jangan menjadikan backend online milik pengembang sebagai syarat untuk:
+- membuka aplikasi;
+- masuk ke dashboard lokal;
+- melihat event lokal;
+- membuat/membaca laporan;
+- menjalankan audit lokal;
+- mengelola konfigurasi lokal.
+
+Jika organisasi memiliki collector/backend lokalnya sendiri, alamatnya harus dikonfigurasi secara eksplisit. Tidak ada remote sign-in, email registration, atau cloud account yang wajib.
+
+====================================================================
+15. MENU KONEKSI: APA YANG DIHAPUS, DIGANTI, DITAMBAHKAN, DIPERTAHANKAN
+====================================================================
+
+DIHAPUS DARI MODE PANTAU WEBSITE (BUKAN DARI APLIKASI SELURUHNYA):
+- token/API key;
+- endpoint API;
+- REST/GraphQL/SOAP/WebSocket options;
+- JSON/XML field mapping;
+- pagination/cursor;
+- enrollment API;
+- konfigurasi Cloudflare Tunnel;
+- permintaan akun/email.
+
+DIGANTI:
+- satu formulir koneksi generik -> wizard berdasarkan tipe target;
+- satu status TERHUBUNG/GAGAL -> status terpisah: Website, API, Feed, SSH, Database, Agent, Collector, sumber audit dan penyimpanan lokal;
+- pesan timeout generik -> pesan berdasarkan kategori penyebab yang terukur;
+- status “server aman” dari ping/HTTP -> “website dapat diakses” saja jika hanya pemeriksaan eksternal;
+- remote cloud sync -> ekspor/impor backup lokal yang manual;
+- login email/online (jika ada) -> profil lokal dan opsional PIN/password lokal atau biometrik perangkat.
+
+DITAMBAHKAN:
+- Pantau Website Publik URL-only;
+- wizard tambah target;
+- mode agen Linux dan Windows yang diuji end-to-end;
+- SSH read-only jika diimplementasikan;
+- Database Audit Source untuk MySQL/MariaDB/SQL Server;
+- collector/SIEM/syslog yang benar-benar diuji;
+- inventaris target, grup/tag/zona;
+- status sumber terpisah;
+- backup terenkripsi dan pemulihan manual;
+- diagnostik serta riwayat lokal;
+- pemeriksaan keamanan input dan koneksi;
+- daftar izin koneksi dan penjelasan jaringan;
+- tes offline yang memastikan data lokal tetap bisa dibuka.
+
+DIPERTAHANKAN:
+- nama Kawal Trace dan tampilan terbaru;
+- semua fitur yang terbukti berfungsi;
+- audit/hash-chain lokal;
+- log lokal, deteksi, notifikasi lokal, ekspor laporan;
+- profil target, konektor API lama, agent/collector yang memang ada;
+- secure storage;
+- semua fitur keamanan yang tidak bertentangan dengan arsitektur local-first.
+
+Tidak ada penghapusan fitur global hanya karena sebuah mode tidak memerlukannya. Sembunyikan field secara kondisional menurut mode.
+
+====================================================================
+16. DATABASE LOKAL DAN MODEL DATA
+====================================================================
+
+Gunakan SQLite/SQLCipher pada perangkat. Skema dibuat melalui migrasi bernomor, tidak menghapus data lama ketika update.
+
+TABEL/ENTITAS YANG DIREKOMENDASIKAN:
+1. local_settings: preferensi, theme, interval default, setting privasi dan kebijakan lokal.
+2. local_profiles: profil lokal, salt/verifier jika menggunakan local unlock, tanpa email wajib.
+3. targets: target_id, nama, type, URL/host/port, group_id, enabled, created_at, last_checked.
+4. target_groups: nama grup/zona dan deskripsi.
+5. website_checks: target_id, waktu UTC, status, HTTP status, DNS/connect/TLS/total timing, error type, certificate info.
+6. security_events: event id, target/source, timestamp UTC, type, severity, normalized fields, raw reference/hash, integrity status.
+7. database_audit_events: sumber audit dan field audit yang disetujui, terpisah dari website_checks.
+8. connector_profiles: tipe konektor, endpoint/host, safe configuration, references to secrets stored by OS secure storage.
+9. secret_refs: hanya identifier/metadata secret; jangan menyimpan secret plaintext di sini.
+10. agent_registry: agent id, target, version, last_seen, state, permission scope, revoked status. Secret/key disimpan terpisah secara aman.
+11. local_audit_chain: sequence, previous_hash, event_hash, timestamp, verification metadata.
+12. notification_history: notifikasi lokal yang dibuat aplikasi.
+13. export_history: nama file, waktu, jenis ekspor, hash integritas; tanpa mengirim ke luar perangkat.
+14. schema_migrations: nomor migrasi, waktu, checksum.
+
+ATURAN DATA:
+- Simpan timestamp dalam UTC dan tampilkan sesuai zona waktu lokal pengguna.
+- Hindari menyimpan raw response lengkap jika tidak perlu.
+- Redaksi password, token, cookie, key dan data sensitif sebelum menyimpan log teknis.
+- Buat indeks untuk target_id, timestamp, category, severity dan event_id.
+- Gunakan transaksi untuk menulis batch event.
+- Jangan hapus data lama secara otomatis tanpa kebijakan retensi yang jelas dan bisa dipahami.
+- Retensi/backup dikontrol secara lokal oleh pengguna.
+
+====================================================================
+17. LOGIN LOKAL TANPA EMAIL DAN KEAMANAN APLIKASI
+====================================================================
+
+Aplikasi tidak memerlukan email atau akun online. Untuk kunci aplikasi, sediakan opsi:
+- tidak menggunakan PIN jika pengguna memilih profil pribadi yang tidak terkunci (jelaskan risikonya);
+- PIN/password lokal;
+- biometrik perangkat jika platform mendukung.
+
+Penyimpanan data:
+- enkripsi database lokal dengan key yang dilindungi secure storage platform bila tersedia;
+- Windows: DPAPI/Credential Manager untuk secrets;
+- Android: Android Keystore melalui API secure storage yang terawat;
+- jangan hard-code encryption key pada source code atau asset;
+- jangan menaruh password/token ke file .env di paket rilis;
+- jangan mencatat secret di log/error/telemetry;
+- gunakan secure deletion yang realistis dan jangan menjanjikan penghapusan forensik sempurna dari flash storage.
+
+AUTENTIKASI LOKAL:
+- hashing password/PIN dengan algoritma password-hashing yang sesuai dan parameter terkalibrasi (jangan gunakan SHA-256 polos sebagai password hash);
+- rate limit percobaan PIN;
+- jeda bertahap setelah kegagalan;
+- opsi kunci otomatis setelah periode tidak aktif;
+- pemulihan lokal melalui backup/recovery key yang dipilih dan disimpan pengguna, bukan email.
+- jika PIN hilang dan tidak ada recovery key, jelaskan bahwa data terenkripsi mungkin tidak dapat dipulihkan.
+
+PERLINDUNGAN APLIKASI:
+- validasi seluruh input;
+- SQL parameterized queries;
+- mencegah command injection dan path traversal;
+- secure defaults dan least privilege;
+- verifikasi sertifikat TLS; jangan menyediakan tombol “abaikan semua sertifikat”;
+- host-key verification pada SSH;
+- signed release packages;
+- dependency pinning dan audit dependensi;
+- build reproducible/semi-reproducible sejauh memungkinkan;
+- update aplikasi secara manual dari paket rilis terverifikasi, tanpa silent self-update;
+- aplikasi tidak mengunduh/menjalankan kode arbitrary dari target remote;
+- proteksi log dari secret leakage;
+- backup terenkripsi dan import dengan pemeriksaan integritas;
+- uji pemulihan data sebelum rilis.
+
+====================================================================
+18. VALIDASI DAN DIAGNOSTIK
+====================================================================
+
+Semua input diverifikasi sebelum koneksi:
+- URL valid dan protokol diizinkan;
+- host/port sesuai format;
+- nama database dan user tidak kosong;
+- konfigurasi autentikasi sesuai tipe konektor;
+- TLS/sertifikat ditangani secara aman;
+- interval dan timeout dalam rentang yang diperbolehkan;
+- path log di server hanya yang diizinkan;
+- alamat jaringan internal hanya digunakan pada koneksi target yang secara eksplisit dibuat pengguna/admin, bukan lewat redirect/URL tersembunyi.
+
+PESAN ERROR YANG JELAS:
+- DNS tidak ditemukan;
+- koneksi ditolak;
+- timeout;
+- sertifikat TLS tidak valid;
+- HTTP 401 autentikasi diperlukan/tidak valid;
+- HTTP 403 akses ditolak;
+- HTTP 404 path tidak ditemukan;
+- API merespons tetapi format feed tidak cocok;
+- token belum diberikan untuk API yang membutuhkan autentikasi;
+- database tidak dapat dijangkau;
+- database berhasil terhubung tetapi audit log tidak aktif/tidak dapat dibaca;
+- SSH host key belum dipercaya;
+- autentikasi SSH gagal;
+- agen offline;
+- collector tidak dapat dijangkau;
+- website berhasil diuji tetapi security log internal tidak tersedia;
+- target tidak bisa diperiksa karena perangkat sedang offline;
+- tidak ada event baru pada periode tersebut (berbeda dari error koneksi).
+
+Jangan tampilkan token, password, SQL secret, private key, cookie, atau konten rahasia dalam pesan error.
+
+====================================================================
+19. UI/UX — STRUKTUR MENU DAN KONSISTENSI
+====================================================================
+
+Pertahankan tampilan terbaru. Terapkan prinsip KISS, hierarchy tipografi, white space, warna konsisten, komponen tombol/form yang sama, label yang jelas dan aksesibilitas.
+
+MENU YANG DISARANKAN:
+- Dashboard
+- Pantau Website
+- Keamanan Server
+- Database Audit
+- Integrasi / Tambah Target
+- Event & Riwayat
+- Notifikasi
+- Laporan / Ekspor
+- Pengaturan Lokal
+- Backup & Restore
+
+Dashboard harus memperlihatkan terpisah:
+- website up/down;
+- agent online/offline;
+- database audit source tersedia/tidak;
+- API feed sehat/error;
+- event keamanan terakhir;
+- jumlah event lokal;
+- waktu pembaruan terakhir.
+
+Setiap jenis target memiliki tombol Uji Koneksi sesuai jenisnya. Jangan menggunakan satu tombol Uji Koneksi yang menjalankan tes API log pada mode website.
+
+Tidak ada halaman registrasi email. Login lokal hanya jika kunci aplikasi diaktifkan. Tidak ada menu cloud sync wajib.
+
+====================================================================
+20. BACKUP, EKSPOR, DAN PEMULIHAN — SEMUA MANUAL/LOKAL
+====================================================================
+
+- Ekspor laporan ke file lokal (format yang sudah didukung dan telah diuji).
+- Ekspor backup lokal terenkripsi yang mencakup database/profil/event yang dipilih tanpa secret plaintext.
+- Import backup dengan pemeriksaan format, checksum/signature bila tersedia, versi skema, dan konfirmasi sebelum merge/replace.
+- Jangan upload backup ke cloud secara otomatis.
+- Pengguna memilih folder/drive/USB secara manual.
+- Tampilkan informasi bahwa file backup tetap menjadi tanggung jawab pemilik perangkat.
+- Pemulihan harus diuji dan didokumentasikan.
+
+====================================================================
+21. FLOW DATA DAN JARINGAN
+====================================================================
+
+DEFAULT FLOW WEBSITE:
+Perangkat Kawal Trace -> URL target yang dimasukkan pengguna -> HTTP/HTTPS request -> hasil pemeriksaan -> database lokal -> dashboard lokal.
+Tidak ada pengiriman ke backend Kawal Trace.
+
+DEFAULT FLOW API LOG:
+Perangkat Kawal Trace -> API target resmi yang dikonfigurasi -> event feed -> normalisasi lokal -> database lokal.
+Tidak ada salinan feed ke cloud Kawal Trace.
+
+DEFAULT FLOW SSH:
+Perangkat Kawal Trace -> server yang disetujui melalui jaringan/LAN/VPN -> perintah read-only yang diizinkan -> log -> database lokal.
+
+DEFAULT FLOW AGENT:
+Agent di server yang diizinkan <-> perangkat/collector lokal melalui LAN/VPN/direct secure route. Pilih pull atau push sesuai jaringan. Tidak ada cloud relay wajib. Jika perangkat aplikasi tidak bisa dijangkau oleh agent, gunakan collector lokal yang disetujui atau metode pull yang diizinkan.
+
+DEFAULT FLOW DATABASE AUDIT:
+Audit engine database -> file/Event Log/syslog atau view audit yang disetujui -> agent/collector/direct connector -> database lokal Kawal Trace.
+
+FLOW CLOUD:
+Jika pengguna mengintegrasikan platform cloud, hanya koneksi ke endpoint platform yang ia pilih dan autentikasinya. Jangan mengirim data ke layanan cloud Kawal Trace. Hasil yang diambil disimpan lokal.
+
+====================================================================
+22. PENGUJIAN WAJIB SEBELUM RILIS
+====================================================================
+
+A. Tes offline:
+- Aplikasi dapat dibuka tanpa internet.
+- Dashboard, pengaturan, event lokal, pencarian, laporan, backup dan restore berfungsi offline.
+- Tidak ada request ke server pengembang saat startup atau login lokal.
+- Tidak ada telemetri/analytics/network traffic yang tidak diminta.
+
+B. Website:
+- URL valid, HTTP success, redirect, DNS failure, timeout, TLS invalid, HTTP 403/404/500.
+- Tidak ada token yang diminta untuk website publik.
+- Riwayat website terpisah dari security log.
+- Pemeriksaan URL tidak memungkinkan akses terselubung ke metadata cloud/localhost.
+
+C. API:
+- API tanpa autentikasi yang sah;
+- token valid dan token tidak valid;
+- 401, 403, 404, timeout;
+- empty feed, JSON invalid, pagination, schema mismatch;
+- credential tidak pernah tampil di log.
+
+D. Linux/Windows Agent:
+- enrollment yang diotorisasi;
+- pembacaan log dengan hak minimum;
+- heartbeat, reconnect, retry, antrean offline, deduplikasi;
+- revocation;
+- collector lokal tidak bisa menerima data dari agen yang tidak terdaftar.
+
+E. SSH:
+- valid host key, host key salah, autentikasi gagal, perintah baca sukses, akses ditolak;
+- tidak ada perintah tulis/jalankan perintah bebas.
+
+F. Database:
+- MySQL/MariaDB/SQL Server connection success/failure;
+- TLS valid/invalid;
+- akun read-only;
+- audit source aktif/tidak aktif;
+- query allowlisted;
+- SQL injection diuji pada input konfigurasi dan tidak berhasil.
+
+G. Local data:
+- database tetap lokal;
+- token disimpan pada secure storage OS;
+- restart aplikasi tidak hilangkan data;
+- backup terenkripsi dapat dipulihkan;
+- update skema mempertahankan data lama;
+- audit hash-chain dapat diverifikasi.
+
+H. Regression:
+- seluruh fitur lama yang dipertahankan tetap bekerja;
+- tampilan baru tidak berubah tanpa alasan;
+- tidak ada fitur lama dihapus tanpa inventaris, keputusan dan tes parity.
+
+====================================================================
+23. KRITERIA SELESAI (DEFINITION OF DONE)
+====================================================================
+
+Pembaruan hanya dianggap selesai jika:
+1. Kode sumber telah benar-benar dimodifikasi.
+2. Semua mode yang ditandai tersedia mempunyai UI, validasi, penyimpanan dan logika koneksi yang nyata.
+3. Website URL-only tidak meminta token API.
+4. Local-first berarti tidak ada akun/email wajib, cloud backend wajib, cloud sync atau telemetry.
+5. Semua data aplikasi dan hasil analisis tersimpan di perangkat secara default.
+6. Semua jalur remote hanya berjalan saat pengguna mengaktifkan target dan jaringan yang dibutuhkan tersedia.
+7. Log website dan security log tidak tercampur.
+8. Token/secret tidak ditulis ke log atau database plaintext.
+9. Fitur lama yang dipertahankan lolos tes regresi.
+10. Build Windows/Android diuji dan artefak hasilnya benar-benar ditemukan.
+11. Tidak ada klaim pengujian atau konektor yang tidak benar-benar dilakukan.
+12. Dokumentasi menjelaskan batasan: URL publik tidak memberikan akses ke log internal server.
+
+====================================================================
+24. INSTRUKSI AKHIR UNTUK PENGEMBANG
+====================================================================
+
+Sebelum coding:
+- audit source code TERBARU yang sedang dipakai pengguna;
+- buat daftar modul, alur UI, dependensi, fitur, tes, target platform, dan cara penyimpanan;
+- buat flowchart pengguna dan aliran data;
+- desain skema database lokal dan kebijakan secret storage;
+- buat mockup/wireframe perubahan koneksi; pertahankan desain baru.
+
+Saat coding:
+- implementasikan satu mode pada satu waktu;
+- pisahkan UI, domain, konektor dan storage;
+- gunakan validasi eksplisit;
+- tambah tes otomatis untuk setiap mode;
+- jangan ubah seluruh stack pada satu perubahan tanpa parity test;
+- jangan memasukkan email/login online/backend developer;
+- jangan membuat telemetry atau cloud sync;
+- jangan menghapus fungsi lama yang sudah bekerja.
+
+Setelah coding:
+- jalankan semua tes;
+- uji offline;
+- uji konektor dengan test server lokal yang dimiliki/diizinkan;
+- verifikasi penyimpanan lokal dan proteksi secret;
+- uji build Windows/Android;
+- laporkan secara jujur fitur yang selesai, belum selesai, dan tes yang benar-benar dijalankan.
+
+RINGKASAN FINAL:
+Kawal Trace harus menjadi aplikasi local-first tanpa akun/email dan tanpa backend cloud wajib. Website publik dipantau melalui URL dan hasil disimpan lokal. Log keamanan dikumpulkan melalui agen, SSH, database audit, collector atau API yang benar-benar tersedia dan diizinkan. Konektor API lama tetap dipertahankan, tetapi tidak dipaksakan kepada pengguna website publik. Semua penyimpanan lokal, proteksi kredensial, audit, riwayat, notifikasi dan laporan tetap dipertahankan. Perubahan harus diterapkan ke source code terbaru dengan tes, bukan sekadar mengubah dokumen atau mengklaim fitur tersedia.
