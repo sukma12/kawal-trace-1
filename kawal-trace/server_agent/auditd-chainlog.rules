@@ -1,0 +1,23 @@
+# Sensitive configuration/identity changes to be reviewed, not automatically blocked.
+# Audit rules are append-only observation; validate syntax against the target distro.
+-w /etc/passwd -p wa -k kawal_trace_sensitive
+-w /etc/shadow -p wa -k kawal_trace_sensitive
+-w /etc/group -p wa -k kawal_trace_sensitive
+-w /etc/gshadow -p wa -k kawal_trace_sensitive
+-w /etc/ssh/sshd_config -p wa -k kawal_trace_sensitive
+-w /etc/sudoers -p wa -k kawal_trace_sensitive
+-w /etc/sudoers.d/ -p wa -k kawal_trace_sensitive
+-w /etc/pam.d/ -p wa -k kawal_trace_sensitive
+-w /etc/systemd/system/ -p wa -k kawal_trace_sensitive
+-w /etc/nginx/ -p wa -k kawal_trace_sensitive
+-w /etc/apache2/ -p wa -k kawal_trace_sensitive
+
+# Website/project-root monitoring. Keep this path identical to KAWAL_TRACE_WATCH_ROOTS
+# in /etc/kawal-trace-agent/agent.env. This records writes/attribute changes, including
+# new files (for example copy/upload), edits/replacements, renames and deletions.
+-a always,exit -F arch=b64 -F dir=/home/server/Anime_Projeck -F perm=wa -k kawal_trace_webroot
+-a always,exit -F arch=b32 -F dir=/home/server/Anime_Projeck -F perm=wa -k kawal_trace_webroot
+
+# OPTIONAL: shared temporary areas generate high event volume; enable only if needed.
+# -a always,exit -F arch=b64 -F dir=/tmp -F perm=wa -k kawal_trace_tempdir
+# -a always,exit -F arch=b64 -F dir=/var/tmp -F perm=wa -k kawal_trace_tempdir

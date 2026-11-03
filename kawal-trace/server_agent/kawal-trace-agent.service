@@ -1,0 +1,35 @@
+[Unit]
+Description=Kawal-Trace Linux Security Telemetry Agent
+After=network-online.target systemd-journald.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=kawal-trace
+Group=kawal-trace
+SupplementaryGroups=systemd-journal kawal-trace-audit
+WorkingDirectory=/opt/kawal-trace
+EnvironmentFile=/etc/kawal-trace-agent/agent.env
+Environment=KAWAL_TRACE_OUTBOX_DB=/var/lib/kawal-trace-agent/outbox.sqlite3
+ExecStart=/usr/bin/python3 -m server_agent.chainlog_server_agent
+Restart=on-failure
+RestartSec=5
+UMask=0077
+StateDirectory=kawal-trace-agent
+StateDirectoryMode=0700
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+ReadWritePaths=/var/lib/kawal-trace-agent
+# Read-only visibility is limited to the configured website/project root so the
+# health worker can verify the path without exposing the rest of /home.
+BindReadOnlyPaths=/home/server/Anime_Projeck
+
+[Install]
+WantedBy=multi-user.target
