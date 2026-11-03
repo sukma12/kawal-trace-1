@@ -1,0 +1,78 @@
+Kawal Trace 1.0 build 8 — Laporan verifikasi (29 Oktober 2026)
+================================================================
+
+BACA DULU — yang TIDAK terbukti oleh laporan ini
+------------------------------------------------
+* Tidak ada EXE, APK, maupun jendela Flet nyata yang dibuka di lingkungan ini (Flet/Flutter/Android SDK tidak terpasang dan paket tidak bisa diunduh).
+  Karena itu klaim "area utama tidak lagi abu-abu setelah klik menu" BELUM terbukti. Yang terbukti hanya: kode dashboard asli berjalan tanpa
+  exception pada tiruan Flet, semua 12 menu terpasang, dan pohon kontrol tidak lagi memuat pola tata letak yang ditolak Flutter.
+* Tes "GUI" di bawah adalah tes STRUKTUR headless, bukan tes tampilan. Tidak ada piksel yang dilihat.
+* Tidak ada pengujian di perangkat nyata (Windows/Android), tidak ada server/agent/SIEM sungguhan, tidak ada biometrik/notifikasi native.
+* Model AI dilatih pada korpus sintetis; akurasinya pada email nyata TIDAK diukur. Database malware/phishing nyata tidak dibawa.
+
+Lingkungan dan pengganti yang saya pakai (semuanya buatan saya, di luar paket yang dikirim)
+-------------------------------------------------------------------------------------
+Sandbox tidak punya pytest, httpx, websockets, flet dan tidak ada akses PyPI. Saya menulis pengganti minimal HANYA untuk menjalankan tes:
+  - shim pytest (fixture, tmp_path, monkeypatch, raises, parametrize, approx, importorskip) — diperbaiki satu kali di tengah pekerjaan
+    karena awalnya membuat tmp_path berbeda tiap fixture (pytest asli berbagi satu instance per tes);
+  - shim httpx berbasis http.client (Client, stream, Timeout, error);
+  - stub websockets: 2 tes WebSocket di test_protocol_adapters.py DILEWATI (bukan lulus).
+Pengganti ini tidak ikut dalam paket. Menjalankan ulang dengan pytest/httpx/websockets asli (python -m pytest -q) tetap diperlukan; saya tidak dapat
+menjamin perilakunya identik pada setiap detail. Python 3.12.3, cryptography 46.0.6, scikit-learn 1.8.0, joblib 1.5.3, Flask 3.1.3.
+
+File tak dikenal: selama tes pertama muncul `tests/flet_stub.py` di folder kerja. File itu TIDAK ada di ZIP Anda, bukan saya yang menulisnya, dan
+tidak dibuat oleh suite asli (saya mengonfirmasi dengan menjalankan suite asli pada salinan bersih ZIP). Saya memindahkannya keluar dari proyek,
+tidak mengeksekusi maupun memakainya, dan menulis `tests/ui_harness.py` sendiri. Jika Anda mengenalinya, itu bukan bagian dari paket ini.
+
+Hasil per jenis tes
+-------------------
+A. Unit + integrasi suite asli Anda (pada salinan bersih ZIP asli, sebelum perubahan): 241 lulus, 2 dilewati (websockets), 0 gagal. Total 243.
+   (Laporan build 7 menyebut 277; angka itu tidak dapat saya reproduksi — selisih ~34 mungkin karena 35 tes API ikut terhitung. Ini dugaan.)
+B. Suite utama setelah perubahan (tests/): 338 lulus, 0 gagal, 2 dilewati = 340 tes.   [tambahan bersih: +97 tes]
+C. Suite API opsional (optional-server-api/tests): 35 lulus, 0 gagal.
+D. compileall main.py chainlog detectors ml_models tests optional-server-api server_agent windows_agent: LULUS.
+
+Tes baru build 8 (semua lulus):
+  test_detectors_core.py            19  unit: hashing, Bloom filter, normalisasi URL, skema SQLite/indeks, injeksi SQL, signature matcher, pruning 30 hari
+  test_detectors_email_ai.py        17  unit/integrasi: ekstraksi tautan (bs4 dan fallback), reputasi URL, parser email, model AI, checksum model, antrean
+  test_detectors_pipeline.py        21  integrasi end-to-end alur diagram: file, email+lampiran, blacklist, ambang AI 70%, API loopback via socket nyata
+  test_backup.py                    18  integrasi: enkripsi, pemulihan nyata ke perangkat baru, salah sandi, pemotongan/penukaran blok, zip-slip, KDF berbahaya
+  test_dashboard_render_contract.py 19  STRUKTUR GUI headless: kode dashboard asli, klik 12 menu, linter tata letak, kompak/HP, error containment, alur pindai & backup
+  test_dashboard_active_view_contract.py (diganti, 4 tes) dan 3 tes kontrak lama yang memeriksa teks implementasi lama diperbarui ke arsitektur baru.
+Perangkat nyata (EXE/APK/GUI): 0 dijalankan.
+
+Verifikasi kualitas tes (uji mutasi manual)
+-------------------------------------------
+Saya merusak kode produksi satu per satu dan memastikan tes menjadi merah. Mutan yang dibunuh: ambang AI, prioritas status, filter Bloom kedaluwarsa,
+penanganan backslash URL, FOREIGN KEY cascade, header Authentication-Results palsu, checksum model, pemangkasan tanda baca URL, flag "blok terakhir"
+pada enkripsi, allow-list nama file backup, penghapusan WAL lama, konfirmasi restore, batas parameter KDF, gerbang rantai audit, salinan pengaman,
+sidebar dibangun ulang saat klik, tombol lama tetap menyala, Row(wrap)+expand pada topbar, gerbang audit viewer, centang konfirmasi restore, penyalinan
+file di desktop, mount tanpa try/except. Dua tes saya awalnya terlalu lemah (mutan lolos) dan sudah diperkuat. Satu kali skrip mutasi terpotong dan
+meninggalkan mutan di chainlog/backup.py; ketahuan oleh tes dan sudah dipulihkan, lalu seluruh pola kode asli diverifikasi ada.
+
+Cakupan baris (tracer sendiri, bukan coverage.py): modul baru 92,0% (1552/1687). main.py blok baru: navigasi 93,0%, panel/penangan 76,4%.
+Baris yang tidak tereksekusi umumnya jalur galat I/O, cabang database website nyata (butuh Secure Storage OS) dan dialog file platform.
+
+Temuan analisis (kode asli)
+---------------------------
+1. Layout: linter menemukan 5 pola pada tata letak build 7 yang ditolak Flutter — `expand` pada Container/Row di dalam induk non-fleksibel (SafeArea, Container),
+   `Column(expand=True)` di dalam `view_host` Container, dan `Column(expand=True)` di dalam `Row(wrap=True)` pada topbar. Hipotesis saya (BUKAN fakta terverifikasi):
+   ini penyebab permukaan abu-abu karena Flutter melukis kotak abu-abu untuk widget yang melempar galat. Semua pola itu dihapus di build 8.
+2. Sidebar dibangun ulang pada setiap klik (kontrol yang sedang menangani klik dibuang). Diganti dengan pewarnaan di tempat.
+3. Logo memakai ft.Image(src="assets/icon.png"); path ini kemungkinan keliru bila assets_dir dipakai. Diganti ikon agar tidak bergantung aset (perubahan tampilan kecil).
+4. Pemindaian pola berisiko (shell=True, eval/exec, pickle, verify=False, SQL berinterpolasi, extractall, 0.0.0.0): tidak ada temuan di kode asli;
+   SQL dinamis di database_audit.py/server.py memakai identifier tervalidasi/allow-list. SHA-1 hanya dipakai untuk TOTP (sesuai RFC 6238).
+5. Riwayat: README/CHANGELOG mencatat gejala "panel utama abu-abu" berulang sejak build 5 dan semuanya hanya diverifikasi di level teks source. Tes kontrak lama
+   memeriksa string kode, bukan perilaku — sebab itu perbaikan sebelumnya bisa "lulus" sambil gejala tetap ada. Build 8 menambah tes yang mengeksekusi kode dashboard.
+
+Risiko kompatibilitas Flet yang tersisa
+---------------------------------------
+Build 8 tidak memakai tipe kontrol maupun argumen keyword Flet yang belum pernah dipakai kode asli, dan ikon baru diselesaikan lewat getattr (tidak bisa menjatuhkan dashboard).
+Satu-satunya pemanggilan API Flet baru: FilePicker.pick_files (dipakai Pilih file / impor daftar / pilih backup). Tidak dapat diverifikasi di sini.
+
+Yang perlu Anda lakukan di perangkat nyata (daftar periksa)
+-----------------------------------------------------------
+1. python -m pytest -q   (dengan pytest/httpx/websockets asli; harap 340 tes, termasuk 2 tes WebSocket) dan python -m pytest -q optional-server-api/tests (35).
+2. Bangun dan jalankan EXE/APK. Setelah login: klik SEMUA 12 menu (admin) satu per satu; area kanan harus berisi konten, bukan abu-abu.
+3. Jika masih abu-abu: kirim isi startup-errors.log (sudah menyamarkan rahasia) dan versi Flet; jangan menganggap laporan ini sebagai bukti render.
+4. Pindai file uji (lihat docs/SCANNER_AND_BACKUP.md "Cara mencoba"), buat backup, verifikasi backup, lalu pulihkan pada folder data sementara.

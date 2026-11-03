@@ -1,0 +1,26 @@
+Kawal Trace 1.0 / build 6 — verification from a clean ZIP extraction
+
+Kawal Trace 1.0 / build 6 — CLEAN ZIP extraction verification
+Timestamp: 2026-10-28 05:23:45 UTC
+This is a source-level clean-extraction test; native GUI/binaries are not included.
+
+$ python -m pytest -q
+........................................................................ [ 26%]
+........................................................................ [ 52%]
+........................................................................ [ 78%]
+............................................................             [100%]
+276 passed in 22.22s
+
+Kawal Trace 1.0 / build 6 — optional API suite from clean ZIP extraction
+Timestamp: 2026-10-28 05:24:09 UTC
+$ python -m pytest -q optional-server-api/tests
+...................................                                      [100%]
+35 passed in 0.83s
+
+Kawal Trace 1.0 / build 6 — compileall from clean ZIP extraction
+Timestamp: 2026-10-28 05:24:11 UTC
+PASS
+
+Panduan.txt byte-for-byte match: PASS
+Manifest entries: 102
+Missing legacy paths: 0

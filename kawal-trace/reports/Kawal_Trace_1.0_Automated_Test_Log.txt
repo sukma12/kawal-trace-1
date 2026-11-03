@@ -1,0 +1,37 @@
+Kawal Trace 1.0 / build 6 — automated verification log
+Date: 28 October 2026
+Scope: source and automated tests. This log is not a native GUI/EXE/APK test.
+
+== Main project suite ==
+Kawal Trace 1.0 / build 6 — main project automated tests
+Timestamp: 2026-10-28 05:22:36 UTC
+........................................................................ [ 26%]
+........................................................................ [ 52%]
+........................................................................ [ 78%]
+............................................................             [100%]
+276 passed in 21.79s
+
+== Optional API suite ==
+Kawal Trace 1.0 / build 6 — optional API tests
+Timestamp: 2026-10-28 05:23:00 UTC
+...................................                                      [100%]
+35 passed in 0.82s
+
+== Python compile check ==
+Kawal Trace 1.0 / build 6 — compileall
+Timestamp: 2026-10-28 05:23:02 UTC
+PASS
+
+== Additional source checks ==
+- All 102 manifest entries (101 original project paths plus Panduan.txt) are included in the source tree.
+- Panduan.txt is byte-for-byte identical to the user's original guide.
+- No `ft.Icons.DATABASE` source reference remains; the database audit control uses `ft.Icons.TABLE_CHART`.
+- No large image control remains in the login header.
+- Build markers in main.py, pyproject.toml, Windows/Android scripts and CI are set to internal build 6; visible version remains 1.0.
+- Feature readiness and limits: docs/FEATURE_READINESS_MATRIX.md.
+
+== Limits: do not misrepresent these ==
+- The actual Flet GUI could not be launched because Flet 1.0.4 and its native build toolchain are unavailable in this audit container.
+- No EXE, Windows installer, or APK was built here.
+- The tests prove only the tested source/unit/integration fixture paths. Remote SSH, production database, live Windows Event Log, deployed Linux agent and vendor-specific SIEM/API targets were not live-tested.
+- The new source needs a native build, installation and an end-to-end setup → login → dashboard → feature smoke test on supported Windows and Android devices before it can be called release-ready.

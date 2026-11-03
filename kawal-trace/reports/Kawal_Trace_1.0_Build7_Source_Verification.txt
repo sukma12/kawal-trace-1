@@ -1,0 +1,28 @@
+Kawal Trace 1.0 / internal build 7 — source verification
+
+Purpose: record what was actually testable in this environment after the blank main-pane screenshot.
+
+Main suite:
+277 passed (pytest; source and unit/integration contract tests).
+
+Optional API suite:
+35 passed.
+
+Python compileall:
+PASS (main.py, chainlog, windows_agent, server_agent, optional-server-api, tests).
+
+Project parity:
+102 entries in docs/LEGACY_FILE_MANIFEST.txt; 0 missing paths.
+Panduan.txt is byte-identical to the original uploaded project.
+
+Dashboard change:
+- Previously, all feature pages were placed inside one scrollable Column and inactive pages were hidden with visible=False.
+- Build 7 mounts only the active feature page via view_host.content; navigation swaps the active page.
+- The right-hand content surface has an explicit dark background.
+- Regression contract test: test_dashboard_active_view_contract.py.
+
+Explicit limitation / not passed:
+- Flet runtime could not be imported or downloaded in this environment (network name resolution unavailable).
+- No Windows EXE or Android APK was built here.
+- No native UI was opened, photographed, or visually confirmed after the change.
+- Therefore there is no claim that the user's blank main pane is verified fixed on Windows/Android. This is a source fix candidate awaiting a native build and real visual test.

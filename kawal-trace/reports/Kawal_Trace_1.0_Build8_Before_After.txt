@@ -1,0 +1,90 @@
+Kawal Trace 1.0 — Perbandingan isi source sebelum dan sesudah (build 7 -> build 8)
+Pembanding: ZIP yang Anda unggah (projeck_kawal_trace_1.zip) vs hasil pekerjaan ini. Dibuat otomatis dengan SHA-256 per file.
+Catatan: file laporan ini dan Kawal_Trace_1.0_Build8_Verification.txt dibuat setelah perhitungan ini, jadi tidak tercantum di bawah.
+
+Ringkasan: 112 file tidak berubah, 18 dimodifikasi, 30 ditambahkan, 0 dihapus.
+
+== DIHAPUS (0 berarti tidak ada file milik Anda yang hilang) ==
+  (tidak ada)
+
+== DIMODIFIKASI ==
+  .github/workflows/build.yml
+      sebelum 20cc6977c8f8a22e… (103 baris)  sesudah faa65492ce73ffa7… (103 baris)  +3 -3
+  .gitignore
+      sebelum fe251c04d68a7c95… (35 baris)  sesudah 8bf0034a55c11c81… (42 baris)  +7 -0
+  AUDIT_REPORT.md
+      sebelum 87b6f3c494bcc356… (66 baris)  sesudah 1a910bedf3e40831… (77 baris)  +11 -0
+  BUILD_ANDROID_APK.cmd
+      sebelum e3f1c9a2bddc928d… (41 baris)  sesudah ffdacb45f23e0b5c… (41 baris)  +1 -1
+  BUILD_ANDROID_WINDOWS.cmd
+      sebelum 50485a3465cbf2a8… (79 baris)  sesudah d13cb65553b313a0… (79 baris)  +2 -2
+  CHANGELOG.md
+      sebelum 525cdca489bd0446… (253 baris)  sesudah b6f7c2f24d51d822… (263 baris)  +10 -0
+  README.md
+      sebelum a29890b7950799df… (165 baris)  sesudah 4926d9d14ddac447… (175 baris)  +14 -4
+  build_windows.bat
+      sebelum 61c342fe885351de… (32 baris)  sesudah d05a8449c20192f0… (32 baris)  +1 -1
+  chainlog/advanced_security.py
+      sebelum a1805b58835a9d9f… (535 baris)  sesudah af54638c277c85ea… (540 baris)  +5 -0
+  docs/FEATURE_READINESS_MATRIX.md
+      sebelum abe6554493f3d2e3… (51 baris)  sesudah 21ea420e3d116f3f… (67 baris)  +19 -3
+  installer/kawal-trace.iss
+      sebelum 29ce6984af5db689… (43 baris)  sesudah 70bdb2f8ffc85b3a… (43 baris)  +1 -1
+  main.py
+      sebelum 12b070df27f19374… (5855 baris)  sesudah c4ad9903de932799… (6423 baris)  +643 -75
+  pyproject.toml
+      sebelum 253c89fa65fb6b6a… (44 baris)  sesudah 0398b8c7de0bcb2d… (54 baris)  +12 -2
+  requirements-dev.txt
+      sebelum 853e25759f4d6a63… (2 baris)  sesudah 24d5bb0bc0f2c1a9… (8 baris)  +6 -0
+  scripts/build_android.sh
+      sebelum 85e5e8da07fed8b4… (22 baris)  sesudah 2ef686b6c0231baf… (22 baris)  +1 -1
+  tests/test_dashboard_active_view_contract.py
+      sebelum da1cb66baefb7fac… (24 baris)  sesudah 246fef7e726601da… (59 baris)  +50 -15
+  tests/test_login_mobile_ui_contract.py
+      sebelum bce7b4d4a406c499… (235 baris)  sesudah b7d9035eedf3fe32… (238 baris)  +12 -9
+  tests/test_native_build_config.py
+      sebelum d48c99abc16697fc… (60 baris)  sesudah 02aa622a6a91a167… (60 baris)  +2 -2
+
+== DITAMBAHKAN ==
+  chainlog/backup.py  sha256 e81b5224429cdd81…  (413 baris)
+  chainlog/redaction.py  sha256 eee860e65dd3c9c0…  (18 baris)
+  detectors/__init__.py  sha256 a9b9c76d2cf96130…  (19 baris)
+  detectors/bloom_filter.py  sha256 615f91867c0b9fb3…  (112 baris)
+  detectors/email_parser.py  sha256 30cbd70bebea44d2…  (231 baris)
+  detectors/file_scanner.py  sha256 30766d0260bd5794…  (30 baris)
+  detectors/hashing.py  sha256 3a22434aae9c6d1d…  (79 baris)
+  detectors/link_extractor.py  sha256 70f472bf3e0c19d7…  (118 baris)
+  detectors/local_api.py  sha256 4eedcde36d7ef982…  (94 baris)
+  detectors/phishing_classifier.py  sha256 40038ed74d645f63…  (170 baris)
+  detectors/pipeline.py  sha256 45a9f294806a0a5b…  (282 baris)
+  detectors/scanner_db.py  sha256 3da97917a3c9d742…  (248 baris)
+  detectors/signature_matcher.py  sha256 91daaa49bfd90061…  (76 baris)
+  detectors/task_queue.py  sha256 94c054462a7600a0…  (120 baris)
+  detectors/text_preprocess.py  sha256 86112f7e5e71e117…  (31 baris)
+  detectors/url_checker.py  sha256 6c0b9b75def4a331…  (48 baris)
+  detectors/urlnorm.py  sha256 7afd52be149bd753…  (102 baris)
+  docs/SCANNER_AND_BACKUP.md  sha256 ae83560e8d0a0c03…  (85 baris)
+  ml_models/MODEL_MANIFEST.json  sha256 b5ddb92ecef3706c…  (15 baris)
+  ml_models/__init__.py  sha256 3e5c5dd76798036f…  (1 baris)
+  ml_models/phishing_model.json  sha256 02049b3d1a3f158d…  (1 baris)
+  ml_models/phishing_model.pkl  sha256 83687a5edaf317f2…  (-1 baris)
+  ml_models/train_model.py  sha256 766b4ec838d8a762…  (104 baris)
+  ml_models/training_corpus.py  sha256 cce34cf5edcaa7c3…  (89 baris)
+  tests/test_backup.py  sha256 3a17f07539eaa367…  (255 baris)
+  tests/test_dashboard_render_contract.py  sha256 bff1e84b8b349f03…  (388 baris)
+  tests/test_detectors_core.py  sha256 e338f07a44ef6a23…  (253 baris)
+  tests/test_detectors_email_ai.py  sha256 42293a34b7468778…  (242 baris)
+  tests/test_detectors_pipeline.py  sha256 7bc7a00817b593aa…  (234 baris)
+  tests/ui_harness.py  sha256 d48dd00769d0a998…  (219 baris)
+
+== TIDAK BERUBAH (termasuk Panduan.txt, yang identik byte-per-byte dengan file Anda) ==
+  Jalankan_aplikasi.bat, Panduan.txt, assets/icon.png, assets/security_alert.wav, chainlog/__init__.py, chainlog/api_discovery.py, chainlog/auth.py, chainlog/connector_ingest.py, chainlog/connectors.py, chainlog/core.py, chainlog/database_audit.py, chainlog/detection.py … dan 100 file lain
+
+== PERUBAHAN PADA main.py (ringkas) ==
+  - Impor baru: chainlog.redaction, chainlog.backup, detectors (dibungkus try/except ImportError agar login tetap jalan bila paket hilang), shutil.
+  - APP_BUILD 7 -> 8; fungsi diagnostik UI _log_ui_diagnostic (menulis startup-errors.log tersamar).
+  - _redact_diagnostic_text kini mendelegasikan ke chainlog.redaction.redact_secrets (perilaku sama, + kata 'passphrase').
+  - _build_dashboard: inisialisasi pemindai; panel Ringkasan Status, Pemindai Keamanan, Backup & Restore; navigasi ditulis ulang
+    (page_body tetap, style_nav, go_to dengan kartu error, topbar tanpa Row(wrap)+expand, SafeArea>Container>Row tanpa expand non-fleksibel,
+    logo ikon menggantikan Image('assets/icon.png')). Semua panel lama tetap ada dan tetap dipasang pada menu masing-masing.
+  - Tidak ada kontrol Flet baru dan tidak ada argumen keyword baru dibanding kode asli; satu-satunya pemanggilan API Flet baru: FilePicker.pick_files.

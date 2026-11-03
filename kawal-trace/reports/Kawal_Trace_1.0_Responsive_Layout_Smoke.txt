@@ -1,0 +1,13 @@
+Kawal Trace 1.0 / build 6 — Responsive UI source-contract status
+Date: 28 October 2026
+
+Assertions in the source-contract suite check:
+- Full-screen centered auth viewport and responsive card sizing.
+- Scroll remains enabled while scrollbar chrome is hidden.
+- No large image control in the login header.
+- PIN-login control exists only when a device PIN is enrolled.
+- Dashboard menu uses adaptive navigation for narrow screens.
+- Diagnostic card follows responsive sizing.
+- Dashboard validates all referenced Flet icon constants before constructing controls.
+
+Limit: this is source-contract + stub smoke testing, NOT a real screenshot/pixel or interaction test. Flet 1.0.4 is not installed in the audit container, so the GUI was not launched at 320x568, 390x844, or 1366x768. The report must not be cited as proof of native rendering.
